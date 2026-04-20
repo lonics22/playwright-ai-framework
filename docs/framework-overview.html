@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 增强自动化测试框架 - 架构详解</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(96, 165, 250, 0.5);
+        }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .directory-tree {
+            line-height: 1.8;
+        }
+
+        .tree-folder {
+            color: #fbbf24;
+        }
+
+        .tree-file {
+            color: #94a3b8;
+        }
+
+        .tree-python {
+            color: #60a5fa;
+        }
+
+        .tree-yaml {
+            color: #f472b6;
+        }
+
+        .tab-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .mermaid {
+            background: transparent !important;
+        }
+
+        .scroll-indicator {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .typing-effect::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="text-slate-200">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="font-bold text-xl gradient-text">AutoTest AI</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#overview" class="nav-link text-sm font-medium hover:text-blue-400">概览</a>
+                    <a href="#architecture" class="nav-link text-sm font-medium hover:text-blue-400">架构</a>
+                    <a href="#structure" class="nav-link text-sm font-medium hover:text-blue-400">目录结构</a>
+                    <a href="#features" class="nav-link text-sm font-medium hover:text-blue-400">核心特性</a>
+                    <a href="#examples" class="nav-link text-sm font-medium hover:text-blue-400">代码示例</a>
+                    <a href="#commands" class="nav-link text-sm font-medium hover:text-blue-400">运行命令</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="overview" class="pt-32 pb-20 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 mb-8">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <span class="text-sm text-blue-300">Python + Playwright + Allure + Browser-Use</span>
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                <span class="gradient-text">AI 增强自动化测试框架</span>
+            </h1>
+
+            <p class="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed">
+                融合传统自动化与 AI 智能驱动，支持<span class="text-blue-400 font-semibold">自然语言测试</span>、
+                <span class="text-purple-400 font-semibold">自我修复定位</span>、
+                <span class="text-pink-400 font-semibold">多 LLM 后端</span>
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4 mb-16">
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <img src="https://playwright.dev/img/logos/playwright-logo.svg" class="w-8 h-8" alt="Playwright">
+                    <span class="font-semibold">Playwright</span>
+                </div>
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white font-bold">Py</div>
+                    <span class="font-semibold">Python 3.10+</span>
+                </div>
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <div class="w-8 h-8 rounded bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center text-white font-bold">A</div>
+                    <span class="font-semibold">Allure Report</span>
+                </div>
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <svg class="w-8 h-8 text-purple-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span class="font-semibold">Browser-Use</span>
+                </div>
+            </div>
+
+            <div class="scroll-indicator">
+                <svg class="w-6 h-6 mx-auto text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features Grid -->
+    <section id="features" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">核心特性</h2>
+            <p class="text-slate-400 text-center mb-12">双模式执行 · 智能定位 · AI 驱动</p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Feature 1 -->
+                <div class="feature-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">双模式执行</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        支持传统脚本测试和 AI Agent 自然语言测试，灵活切换，取长补短
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">智能元素定位</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        AI 辅助元素识别，当传统定位失败时自动寻找替代方案（自我修复）
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">智能失败重试</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        AI 分析失败原因，自适应调整策略后重试，提高测试稳定性
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">视觉回归测试</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        结合 Playwright 截图与 AI 图像比对，检测 UI 视觉变更
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">多 LLM 支持</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        支持 OpenAI、Anthropic Claude、本地 Ollama 等多种 LLM 后端
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Allure 报告</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">
+                        专业级测试报告，支持 AI 执行日志、截图、视频等丰富附件
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">架构设计</h2>
+            <p class="text-slate-400 text-center mb-12">三层架构：驱动层 · AI 层 · 应用层</p>
+
+            <div class="glass-card rounded-2xl p-8 border border-slate-700/50">
+                <div class="mermaid">
+flowchart TB
+    subgraph TestLayer["📁 测试层 (Tests)"]
+        T1["Traditional Tests<br/>传统脚本测试"]
+        T2["AI-Driven Tests<br/>自然语言测试"]
+        T3["Hybrid Tests<br/>混合模式测试"]
+    end
+
+    subgraph PageLayer["📁 页面对象层 (Pages)"]
+        P1["BasePage<br/>基础页面对象"]
+        P2["AIPage<br/>AI增强页面"]
+        P3["Components<br/>可复用组件"]
+    end
+
+    subgraph CoreLayer["📁 核心层 (Core)"]
+        subgraph Driver["🔌 Driver 驱动"]
+            D1["Playwright Driver"]
+            D2["Browser-Use Adapter"]
+        end
+
+        subgraph AI["🤖 AI Agent"]
+            A1["Agent Factory<br/>多LLM支持"]
+            A2["Custom Tools<br/>自定义工具"]
+            A3["Smart Locator<br/>智能定位"]
+        end
+
+        subgraph Report["📊 Reporting"]
+            R1["Allure Helper"]
+            R2["AI Insights"]
+        end
+    end
+
+    subgraph External["🔗 外部服务"]
+        E1["OpenAI API"]
+        E2["Anthropic API"]
+        E3["Ollama Local"]
+        E4["Target Website"]
+    end
+
+    T1 --> P1
+    T2 --> P2
+    T3 --> P2
+
+    P1 --> D1
+    P2 --> D2
+
+    D2 --> A1
+    A1 --> A2
+    A1 --> A3
+
+    A1 --> E1
+    A1 --> E2
+    A1 --> E3
+    D1 --> E4
+    D2 --> E4
+
+    T1 --> R1
+    T2 --> R2
+    T3 --> R1
+    T3 --> R2
+                </div>
+            </div>
+
+            <!-- Architecture Details -->
+            <div class="grid md:grid-cols-3 gap-6 mt-8">
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h4 class="font-bold text-blue-400 mb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded bg-blue-500/20 flex items-center justify-center text-xs">1</span>
+                        驱动层 (Driver Layer)
+                    </h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Playwright 原生 API 封装</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Browser-Use 适配器集成</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>多浏览器统一管理</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h4 class="font-bold text-purple-400 mb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-xs">2</span>
+                        AI 层 (AI Layer)
+                    </h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Agent 工厂模式（多 LLM）</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>自定义工具扩展</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>智能元素定位与修复</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h4 class="font-bold text-pink-400 mb-3 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded bg-pink-500/20 flex items-center justify-center text-xs">3</span>
+                        应用层 (App Layer)
+                    </h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>页面对象模型 (POM)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>组件化复用</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Allure 报告集成</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Directory Structure -->
+    <section id="structure" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">目录结构</h2>
+            <p class="text-slate-400 text-center mb-12">清晰的分层设计，支持传统与 AI 双模式</p>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Directory Tree -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                        </svg>
+                        项目结构
+                    </h3>
+                    <div class="directory-tree code-font text-sm overflow-x-auto">
+<pre class="text-slate-300">
+automation-framework/
+├── 📁 <span class="tree-folder">config/</span>                    <span class="text-slate-500"># 配置管理</span>
+│   ├── <span class="tree-yaml">env_config.yaml</span>            <span class="text-slate-500"># 环境配置</span>
+│   └── <span class="tree-yaml">browser_config.yaml</span>        <span class="text-slate-500"># 浏览器配置</span>
+│
+├── 📁 <span class="tree-folder">core/</span>                      <span class="text-slate-500"># 框架核心</span>
+│   ├── 📁 <span class="tree-folder">driver/</span>
+│   │   ├── <span class="tree-python">playwright_driver.py</span>     <span class="text-slate-500"># Playwright封装</span>
+│   │   └── <span class="tree-python">browser_use_adapter.py</span>   <span class="text-slate-500"># AI适配器</span>
+│   ├── 📁 <span class="tree-folder">ai/</span>
+│   │   ├── <span class="tree-python">agent_factory.py</span>         <span class="text-slate-500"># Agent工厂</span>
+│   │   └── <span class="tree-python">custom_tools.py</span>          <span class="text-slate-500"># 自定义工具</span>
+│   └── 📁 <span class="tree-folder">elements/</span>
+│       └── <span class="tree-python">smart_locator.py</span>         <span class="text-slate-500"># 智能定位</span>
+│
+├── 📁 <span class="tree-folder">pages/</span>                     <span class="text-slate-500"># 页面对象</span>
+│   ├── <span class="tree-python">base_page.py</span>               <span class="text-slate-500"># 基础页面对象</span>
+│   └── <span class="tree-python">ai_page.py</span>                 <span class="text-slate-500"># AI增强页面</span>
+│
+├── 📁 <span class="tree-folder">tests/</span>                     <span class="text-slate-500"># 测试用例</span>
+│   ├── 📁 <span class="tree-folder">traditional/</span>             <span class="text-slate-500"># 传统测试</span>
+│   ├── 📁 <span class="tree-folder">ai_driven/</span>               <span class="text-slate-500"># AI驱动测试</span>
+│   └── 📁 <span class="tree-folder">hybrid/</span>                  <span class="text-slate-500"># 混合测试</span>
+│
+├── 📁 <span class="tree-folder">reports/</span>                   <span class="text-slate-500"># 测试报告</span>
+│   └── 📁 <span class="tree-folder">allure-results/</span>
+│
+├── <span class="tree-yaml">pytest.ini</span>                 <span class="text-slate-500"># pytest配置</span>
+└── <span class="tree-python">requirements.txt</span>           <span class="text-slate-500"># 依赖管理</span>
+</pre>
+                    </div>
+                </div>
+
+                <!-- Module Description -->
+                <div class="space-y-4">
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="text-blue-400 font-bold text-lg">01</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">config/ - 配置管理</h4>
+                                <p class="text-slate-400 text-sm">支持多环境配置（dev/staging/prod）、浏览器参数、AI 模型设置等 YAML 配置</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50 hover:border-purple-500/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="text-purple-400 font-bold text-lg">02</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">core/ - 框架核心</h4>
+                                <p class="text-slate-400 text-sm">驱动层封装、AI Agent 工厂、智能定位器、自定义工具等核心能力</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50 hover:border-pink-500/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="text-pink-400 font-bold text-lg">03</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">pages/ - 页面对象</h4>
+                                <p class="text-slate-400 text-sm">POM 设计模式，BasePage 提供传统方法，AIPage 扩展 AI 能力（ai_click, ai_fill）</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50 hover:border-green-500/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="text-green-400 font-bold text-lg">04</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">tests/ - 测试用例</h4>
+                                <p class="text-slate-400 text-sm">三种测试模式：traditional（传统）、ai_driven（纯 AI）、hybrid（混合，推荐）</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50 hover:border-orange-500/50 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                                <span class="text-orange-400 font-bold text-lg">05</span>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">reports/ - 测试报告</h4>
+                                <p class="text-slate-400 text-sm">Allure 报告输出，包含 AI 执行日志、截图、视频、失败分析等丰富附件</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Examples -->
+    <section id="examples" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">代码示例</h2>
+            <p class="text-slate-400 text-center mb-12">三种测试模式的实际代码对比</p>
+
+            <!-- Tab Navigation -->
+            <div class="flex justify-center gap-4 mb-8">
+                <button onclick="switchTab('traditional')" id="tab-traditional" class="tab-btn px-6 py-3 rounded-xl font-medium transition-all tab-active">
+                    传统测试
+                </button>
+                <button onclick="switchTab('ai')" id="tab-ai" class="tab-btn px-6 py-3 rounded-xl font-medium transition-all bg-slate-800 hover:bg-slate-700">
+                    AI 驱动测试
+                </button>
+                <button onclick="switchTab('hybrid')" id="tab-hybrid" class="tab-btn px-6 py-3 rounded-xl font-medium transition-all bg-slate-800 hover:bg-slate-700">
+                    混合测试（推荐）
+                </button>
+            </div>
+
+            <!-- Code Panels -->
+            <div class="glass-card rounded-2xl border border-slate-700/50 overflow-hidden">
+                <!-- Traditional Test -->
+                <div id="panel-traditional" class="code-panel">
+                    <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-400">tests/traditional/test_login.py</span>
+                        <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs">Traditional</span>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre><code class="language-python">import pytest
+import allure
+from pages.login_page import LoginPage
+
+@pytest.mark.smoke
+@allure.feature("用户认证")
+@allure.story("登录功能")
+class TestLogin:
+    """传统模式：使用明确的选择器和步骤"""
+
+    @allure.title("使用有效凭据登录")
+    def test_login_with_valid_credentials(self, page):
+        # Arrange
+        login_page = LoginPage(page)
+        login_page.navigate_to()
+
+        # Act
+        login_page.fill_username("user@example.com")
+        login_page.fill_password("password123")
+        login_page.click_login_button()
+
+        # Assert
+        assert login_page.is_logged_in()
+        allure.attach(
+            page.screenshot(),
+            name="登录成功截图",
+            attachment_type=allure.attachment_type.PNG
+        )</code></pre>
+                    </div>
+                </div>
+
+                <!-- AI Driven Test -->
+                <div id="panel-ai" class="code-panel hidden">
+                    <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-400">tests/ai_driven/test_natural_language.py</span>
+                        <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs">AI-Driven</span>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre><code class="language-python">import pytest
+import allure
+
+@pytest.mark.ai
+@allure.feature("AI 驱动测试")
+@allure.story("自然语言任务执行")
+class TestNaturalLanguage:
+    """AI 模式：使用自然语言描述复杂场景"""
+
+    @allure.title("完成完整购物流程")
+    async def test_shopping_journey(self, ai_agent, page):
+        # 传统方式：打开页面
+        await page.goto("https://example-shop.com")
+
+        # AI 方式：执行复杂任务
+        result = await ai_agent.execute_task("""
+            完成一次完整的购物流程：
+            1. 在搜索框输入 "wireless headphones"
+            2. 选择第一个商品加入购物车
+            3. 进入购物车结算
+            4. 使用测试信用卡完成支付
+            5. 验证订单确认页面显示成功消息
+        """)
+
+        # Allure 附加 AI 执行详情
+        allure.attach(
+            result.execution_log,
+            name="AI 执行日志",
+            attachment_type=allure.attachment_type.TEXT
+        )
+
+        assert result.success</code></pre>
+                    </div>
+                </div>
+
+                <!-- Hybrid Test -->
+                <div id="panel-hybrid" class="code-panel hidden">
+                    <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-400">tests/hybrid/test_e2e_with_ai.py</span>
+                        <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs">Hybrid ⭐</span>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre><code class="language-python">import pytest
+import allure
+from pages.login_page import LoginPage
+
+@pytest.mark.hybrid
+@allure.feature("混合模式测试")
+class TestE2EWithAI:
+    """混合模式：稳定流程用传统方式，易变流程用 AI"""
+
+    @allure.title("登录后 AI 完成复杂操作")
+    async def test_login_then_ai_task(self, page, ai_adapter):
+        # 传统方式：稳定的登录流程（选择器固定、不易变）
+        login_page = LoginPage(page)
+        login_page.login("user@test.com", "password123")
+
+        # AI 方式：处理复杂、易变的业务流程
+        result = await ai_adapter.execute_task("""
+            在个人中心完成以下操作：
+            1. 找到订单历史标签并点击
+            2. 找到最近一笔未评价的订单
+            3. 为该订单添加五星好评，评论写 "Great product!"
+            4. 上传一张测试图片作为评价配图
+            5. 提交评价并确认成功
+        """)
+
+        assert result.success</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Page Class Example -->
+            <div class="mt-8 glass-card rounded-2xl border border-slate-700/50 overflow-hidden">
+                <div class="bg-slate-900 px-6 py-4 border-b border-slate-700">
+                    <span class="text-sm font-medium text-slate-400">pages/ai_page.py - 双模式页面对象基类</span>
+                </div>
+                <div class="p-6 overflow-x-auto">
+                    <pre><code class="language-python">from playwright.sync_api import Page
+from core.driver.browser_use_adapter import AIAgentAdapter
+
+class AIPage:
+    """AI 增强的基础页面对象 - 支持传统和 AI 两种模式"""
+
+    def __init__(self, page: Page, ai_adapter: AIAgentAdapter = None):
+        self.page = page
+        self.ai = ai_adapter
+        self._smart_mode = ai_adapter is not None
+
+    # ========== 传统模式方法 ==========
+    def click(self, selector: str):
+        """传统点击操作"""
+        self.page.click(selector)
+
+    def fill(self, selector: str, value: str):
+        """传统输入操作"""
+        self.page.fill(selector, value)
+
+    # ========== AI 模式方法 ==========
+    async def ai_click(self, element_description: str):
+        """AI 驱动的点击 - 通过自然语言描述定位元素"""
+        if not self._smart_mode:
+            raise RuntimeError("AI adapter not initialized")
+
+        task = f"在页面上找到 '{element_description}' 并点击它"
+        return await self.ai.execute_task(task)
+
+    async def ai_fill_form(self, form_data: dict):
+        """AI 驱动的表单填写"""
+        fields = ", ".join([f"{k}={v}" for k, v in form_data.items()])
+        task = f"填写表单，字段值: {fields}"
+        return await self.ai.execute_task(task)
+
+    async def ai_verify(self, expectation: str):
+        """AI 驱动的验证 - 自然语言断言"""
+        task = f"验证页面是否符合预期: {expectation}"
+        result = await self.ai.execute_task(task)
+        return result.success</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Commands Section -->
+    <section id="commands" class="py-20 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">运行命令</h2>
+            <p class="text-slate-400 text-center mb-12">常用测试执行命令速查</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Command 1 -->
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h4 class="font-bold text-blue-400 mb-3">运行传统测试</h4>
+                    <div class="bg-slate-900 rounded-lg p-4 code-font text-sm overflow-x-auto">
+                        <pre><code class="language-bash">pytest tests/traditional/ -v \
+  --alluredir=reports/allure-results</code></pre>
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2">执行所有传统脚本测试用例</p>
+                </div>
+
+                <!-- Command 2 -->
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h4 class="font-bold text-purple-400 mb-3">运行 AI 驱动测试</h4>
+                    <div class="bg-slate-900 rounded-lg p-4 code-font text-sm overflow-x-auto">
+                        <pre><code class="language-bash">pytest tests/ai_driven/ -v -m ai \
+  --llm=openai \
+  --alluredir=reports/allure-results</code></pre>
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2">使用 OpenAI GPT-4 执行自然语言测试</p>
+                </div>
+
+                <!-- Command 3 -->
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h4 class="font-bold text-green-400 mb-3">运行混合测试</h4>
+                    <div class="bg-slate-900 rounded-lg p-4 code-font text-sm overflow-x-auto">
+                        <pre><code class="language-bash">pytest tests/hybrid/ -v -m hybrid \
+  --llm=anthropic \
+  --alluredir=reports/allure-results</code></pre>
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2">使用 Claude 模型执行混合模式测试</p>
+                </div>
+
+                <!-- Command 4 -->
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h4 class="font-bold text-orange-400 mb-3">并发执行（传统测试）</h4>
+                    <div class="bg-slate-900 rounded-lg p-4 code-font text-sm overflow-x-auto">
+                        <pre><code class="language-bash">pytest tests/traditional/ -n auto \
+  --dist=loadgroup</code></pre>
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2">使用 pytest-xdist 多进程并行执行</p>
+                </div>
+
+                <!-- Command 5 -->
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50 md:col-span-2">
+                    <h4 class="font-bold text-pink-400 mb-3">生成 Allure 报告</h4>
+                    <div class="bg-slate-900 rounded-lg p-4 code-font text-sm overflow-x-auto">
+                        <pre><code class="language-bash"># 生成报告
+allure generate reports/allure-results \
+  -o reports/allure-report \
+  --clean
+
+# 启动报告服务
+allure open reports/allure-report</code></pre>
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2">生成并查看可视化测试报告</p>
+                </div>
+            </div>
+
+            <!-- Requirements -->
+            <div class="mt-8 glass-card rounded-2xl border border-slate-700/50 overflow-hidden">
+                <div class="bg-slate-900 px-6 py-4 border-b border-slate-700">
+                    <span class="text-sm font-medium text-slate-400">requirements.txt - 核心依赖</span>
+                </div>
+                <div class="p-6 overflow-x-auto">
+                    <pre><code class="language-text"># 核心依赖
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-xdist>=3.5.0
+playwright>=1.41.0
+allure-pytest>=2.13.0
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+
+# Browser-Use 及 AI 相关
+browser-use>=0.1.0
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-anthropic>=0.1.0
+langchain-ollama>=0.0.1</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <span class="font-bold text-xl gradient-text">AutoTest AI Framework</span>
+            </div>
+            <p class="text-slate-500 text-sm">
+                Python + Playwright + Allure + Browser-Use · AI 增强自动化测试框架
+            </p>
+            <p class="text-slate-600 text-xs mt-2">
+                基于 <a href="https://github.com/browser-use/browser-use" class="text-blue-400 hover:underline" target="_blank">browser-use</a> 构建
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#f1f5f9',
+                primaryBorderColor: '#60a5fa',
+                lineColor: '#64748b',
+                secondaryColor: '#8b5cf6',
+                tertiaryColor: '#ec4899',
+                fontFamily: 'Inter, sans-serif'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // Initialize Highlight.js
+        hljs.highlightAll();
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all panels
+            document.querySelectorAll('.code-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+
+            // Show selected panel
+            document.getElementById(`panel-${tabName}`).classList.remove('hidden');
+
+            // Update button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('bg-slate-800');
+            });
+
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('bg-slate-800');
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Active Navigation Highlight
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('text-blue-400');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('text-blue-400');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

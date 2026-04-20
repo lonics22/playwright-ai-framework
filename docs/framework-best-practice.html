@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动化测试框架最佳实践 - 完整设计指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/ini.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/toml.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f1a 0%, #121929 50%, #0a0f1a 100%);
+            min-height: 100vh;
+        }
+
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-border {
+            position: relative;
+        }
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+        .nav-link.active { color: #60a5fa; }
+
+        .principle-card {
+            transition: all 0.3s ease;
+        }
+        .principle-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        }
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1.5rem;
+            width: 2px;
+            height: calc(100% - 1rem);
+            background: linear-gradient(to bottom, #3b82f6, transparent);
+        }
+        .timeline-item:last-child::after { display: none; }
+
+        .risk-card {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        .risk-card:hover {
+            border-left-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .directory-tree {
+            line-height: 1.8;
+        }
+        .tree-folder { color: #fbbf24; }
+        .tree-file { color: #94a3b8; }
+        .tree-python { color: #60a5fa; }
+        .tree-yaml { color: #f472b6; }
+        .tree-sh { color: #4ade80; }
+
+        .checklist-item {
+            transition: all 0.2s ease;
+        }
+        .checklist-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            padding-left: 0.5rem;
+        }
+        .checklist-item.checked {
+            opacity: 0.6;
+        }
+        .checklist-item.checked span {
+            text-decoration: line-through;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1e293b 100%);
+        }
+        .comparison-table tr:hover td {
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .mermaid { background: transparent !important; }
+        .mermaid svg { max-width: 100%; height: auto; }
+
+        .smooth-scroll { scroll-behavior: smooth; }
+
+        .sticky-toc {
+            position: sticky;
+            top: 5rem;
+            max-height: calc(100vh - 6rem);
+            overflow-y: auto;
+        }
+        .sticky-toc::-webkit-scrollbar { width: 4px; }
+        .sticky-toc::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 2px;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body class="text-slate-300">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass-card border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <span class="font-bold text-xl gradient-text">AutoTest Framework</span>
+                </div>
+                <div class="hidden lg:flex items-center gap-6">
+                    <a href="#principles" class="nav-link text-sm font-medium">设计原则</a>
+                    <a href="#architecture" class="nav-link text-sm font-medium">架构</a>
+                    <a href="#structure" class="nav-link text-sm font-medium">目录结构</a>
+                    <a href="#ai-strategy" class="nav-link text-sm font-medium">AI策略</a>
+                    <a href="#implementation" class="nav-link text-sm font-medium">实现</a>
+                    <a href="#roadmap" class="nav-link text-sm font-medium">路线图</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 mb-8">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                <span class="text-sm text-blue-300">最佳实践融合版 v1.0</span>
+            </div>
+
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                <span class="gradient-text">生产级自动化测试框架</span>
+            </h1>
+
+            <p class="text-xl text-slate-400 max-w-4xl mx-auto mb-8 leading-relaxed">
+                可回归、可扩展、可观测、可AI增强的测试体系<br>
+                <span class="text-blue-400">Playwright + Allure + browser-use</span> 三位一体设计
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                    <span class="font-medium">稳定优先</span>
+                </div>
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                    <span class="font-medium">证据充分</span>
+                </div>
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-pink-500"></div>
+                    <span class="font-medium">可控AI</span>
+                </div>
+                <div class="glass-card px-6 py-3 rounded-xl flex items-center gap-3">
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span class="font-medium">安全合规</span>
+                </div>
+            </div>
+
+            <!-- Value Comparison Table -->
+            <div class="glass-card rounded-2xl p-6 border border-slate-700/50 max-w-4xl mx-auto">
+                <h3 class="text-lg font-bold mb-4 text-center">价值主张对比</h3>
+                <table class="w-full text-left comparison-table">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="py-3 px-4 text-slate-300">能力维度</th>
+                            <th class="py-3 px-4 text-slate-400">传统框架</th>
+                            <th class="py-3 px-4 text-blue-400 font-semibold">本框架</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr class="border-b border-slate-800">
+                            <td class="py-3 px-4 font-medium">稳定性</td>
+                            <td class="py-3 px-4 text-slate-500">依赖精确定位器</td>
+                            <td class="py-3 px-4 text-blue-300">传统定位 + AI自愈备选</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-3 px-4 font-medium">可维护性</td>
+                            <td class="py-3 px-4 text-slate-500">页面变更需手动修复</td>
+                            <td class="py-3 px-4 text-blue-300">AI辅助定位器更新建议</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-3 px-4 font-medium">覆盖度</td>
+                            <td class="py-3 px-4 text-slate-500">仅覆盖已知场景</td>
+                            <td class="py-3 px-4 text-blue-300">AI探索未知路径</td>
+                        </tr>
+                        <tr class="border-b border-slate-800">
+                            <td class="py-3 px-4 font-medium">调试效率</td>
+                            <td class="py-3 px-4 text-slate-500">截图 + 日志</td>
+                            <td class="py-3 px-4 text-blue-300">截图 + Trace + AI步骤历史</td>
+                        </tr>
+                        <tr>
+                            <td class="py-3 px-4 font-medium">开发速度</td>
+                            <td class="py-3 px-4 text-slate-500">需编写全部脚本</td>
+                            <td class="py-3 px-4 text-blue-300">可用自然语言描述任务</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Design Principles -->
+    <section id="principles" class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">五大核心设计原则</h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Principle 1 -->
+                <div class="principle-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-blue-400">1</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-blue-400">稳定优先</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">
+                        确定性回归测试与AI探索测试严格分层，不相互污染
+                    </p>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-400">•</span>
+                            <span>回归测试：传统Playwright，可重复、可预测</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-400">•</span>
+                            <span>探索测试：AI Agent驱动，发现未知问题</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-400">•</span>
+                            <span>混合测试：关键路径传统，易变路径AI</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Principle 2 -->
+                <div class="principle-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-purple-400">2</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-purple-400">证据优先</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">
+                        每次失败必须有足够上下文支持问题定位
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 rounded bg-purple-500/10 text-purple-300 text-xs">失败截图</span>
+                        <span class="px-2 py-1 rounded bg-purple-500/10 text-purple-300 text-xs">DOM快照</span>
+                        <span class="px-2 py-1 rounded bg-purple-500/10 text-purple-300 text-xs">Trace</span>
+                        <span class="px-2 py-1 rounded bg-purple-500/10 text-purple-300 text-xs">视频</span>
+                        <span class="px-2 py-1 rounded bg-purple-500/10 text-purple-300 text-xs">AI历史</span>
+                        <span class="px-2 py-1 rounded bg-purple-500/10 text-purple-300 text-xs">HAR</span>
+                    </div>
+                </div>
+
+                <!-- Principle 3 -->
+                <div class="principle-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-pink-400">3</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-pink-400">可控AI</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">
+                        AI能力默认"辅助模式"，逐步开放"执行模式"
+                    </p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-4 h-4 rounded bg-pink-500/20 flex items-center justify-center text-pink-400">✓</span>
+                            <span class="text-slate-400">assist: AI只给建议，不直接改写逻辑</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-4 h-4 rounded bg-pink-500/20 flex items-center justify-center text-pink-400">✓</span>
+                            <span class="text-slate-400">semi-auto: 白名单域名、白名单动作</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="w-4 h-4 rounded bg-pink-500/20 flex items-center justify-center text-pink-400">✓</span>
+                            <span class="text-slate-400">agent: 纯Agent场景，用于探索与复现</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Principle 4 -->
+                <div class="principle-card glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-green-400">4</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-green-400">安全合规</h3>
+                    </div>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">🔒</span>
+                            <span>密钥与敏感数据分离 (secret_provider)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">🛡️</span>
+                            <span>PII数据脱敏过滤 (pii_filter)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">🌐</span>
+                            <span>域名白名单限制 (allowed_domains)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">🚫</span>
+                            <span>可关闭遥测</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Principle 5 -->
+                <div class="principle-card glass-card rounded-2xl p-6 border border-slate-700/50 md:col-span-2 lg:col-span-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
+                            <span class="text-2xl font-bold text-orange-400">5</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-orange-400">可演进</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">
+                        先实现骨架和最小闭环，再迭代智能化能力
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <div class="flex-1 glass-card rounded-lg p-4 text-center">
+                            <div class="text-orange-400 font-bold mb-1">Phase 1</div>
+                            <div class="text-xs text-slate-400">稳定回归</div>
+                        </div>
+                        <div class="text-slate-600">→</div>
+                        <div class="flex-1 glass-card rounded-lg p-4 text-center">
+                            <div class="text-orange-400 font-bold mb-1">Phase 2</div>
+                            <div class="text-xs text-slate-400">AI增强</div>
+                        </div>
+                        <div class="text-slate-600">→</div>
+                        <div class="flex-1 glass-card rounded-lg p-4 text-center">
+                            <div class="text-orange-400 font-bold mb-1">Phase 3</div>
+                            <div class="text-xs text-slate-400">体系化</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">整体架构设计</h2>
+            <p class="text-slate-400 text-center mb-12">四层架构：测试层 → 页面层 → 核心层 → 基础设施</p>
+
+            <div class="glass-card rounded-2xl p-8 border border-slate-700/50 mb-8">
+                <div class="mermaid">
+flowchart TB
+    subgraph TestLayer["📁 测试用例层 (tests/)"]
+        T1["e2e/smoke<br/>冒烟测试"]
+        T2["regression<br/>回归测试"]
+        T3["ai_explore<br/>AI探索测试"]
+    end
+
+    subgraph PageLayer["📁 页面与流程层"]
+        P1["PageObject<br/>传统页面对象"]
+        P2["AIPage<br/>AI增强页面"]
+        P3["FlowObject<br/>业务流程"]
+    end
+
+    subgraph CoreLayer["📁 核心能力层 (core/)"]
+        C1["Playwright<br/>引擎管理"]
+        C2["AI/browser-use<br/>Agent服务"]
+        C3["Reporting<br/>Allure增强"]
+        C4["Security<br/>安全管理"]
+        C5["Smart Locator<br/>智能定位"]
+    end
+
+    subgraph Infra["🔗 基础设施"]
+        I1["LLM API<br/>OpenAI/Claude"]
+        I2["Target Site<br/>被测系统"]
+        I3["CI/CD<br/>GitHub Actions"]
+    end
+
+    TestLayer --> PageLayer
+    PageLayer --> CoreLayer
+    CoreLayer --> Infra
+
+    T3 -.->|直接调用| C2
+
+    style TestLayer fill:#1e3a5f,stroke:#3b82f6
+    style PageLayer fill:#3d1e5f,stroke:#8b5cf6
+    style CoreLayer fill:#1e3d2f,stroke:#22c55e
+                </div>
+            </div>
+
+            <!-- AI Architecture Detail -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm">A</span>
+                        技术栈定位
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">测试执行层</span>
+                            <span class="text-blue-300">pytest + Playwright + Allure</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                            <span class="text-slate-400">AI增强层</span>
+                            <span class="text-purple-300">browser-use + LangChain + 多LLM</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <span class="text-slate-400">基础设施</span>
+                            <span class="text-green-300">CI/CD + 报告服务 + 密钥管理</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 border border-slate-700/50">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 text-sm">B</span>
+                        三层测试策略
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium">Smoke - 冒烟测试</div>
+                                <div class="text-xs text-slate-500">5分钟核心链路验证，阻塞合并</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium">Regression - 回归测试</div>
+                                <div class="text-xs text-slate-500">Nightly全量覆盖，阻塞发布</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                            <div class="flex-1">
+                                <div class="text-sm font-medium">AI Explore - 探索测试</div>
+                                <div class="text-xs text-slate-500">发现盲区，初期仅告警不阻塞</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Directory Structure -->
+    <section id="structure" class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">目录结构详解</h2>
+            <p class="text-slate-400 text-center mb-12">清晰的分层设计，支持模块化扩展</p>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Directory Tree -->
+                <div class="glass-card rounded-2xl p-6 border border-slate-700/50">
+                    <h3 class="text-lg font-bold mb-4">项目结构</h3>
+                    <div class="directory-tree code-font text-xs overflow-x-auto">
+<pre class="text-slate-300 leading-relaxed">
+automation-framework/
+├── 📄 <span class="tree-python">pyproject.toml</span>           <span class="text-slate-600"># 项目配置</span>
+├── 📄 <span class="tree-yaml">pytest.ini</span>                <span class="text-slate-600"># pytest配置</span>
+├── 📄 <span class="tree-yaml">.env.example</span>              <span class="text-slate-600"># 环境变量模板</span>
+│
+├── 📁 <span class="tree-folder">config/</span>                    <span class="text-slate-600"># 配置管理</span>
+│   ├── <span class="tree-yaml">settings.yaml</span>           <span class="text-slate-600"># 全局配置</span>
+│   ├── <span class="tree-yaml">env.dev.yaml</span>            <span class="text-slate-600"># 开发环境</span>
+│   ├── <span class="tree-yaml">env.test.yaml</span>           <span class="text-slate-600"># 测试环境</span>
+│   └── <span class="tree-yaml">env.prod.yaml</span>           <span class="text-slate-600"># 生产环境</span>
+│
+├── 📁 <span class="tree-folder">core/</span>                      <span class="text-slate-600"># 框架核心</span>
+│   ├── 📁 <span class="tree-folder">playwright/</span>
+│   │   ├── <span class="tree-python">browser_manager.py</span>    <span class="text-slate-600"># 浏览器管理</span>
+│   │   └── <span class="tree-python">context_factory.py</span>    <span class="text-slate-600"># 上下文工厂</span>
+│   │
+│   ├── 📁 <span class="tree-folder">ai/</span>
+│   │   ├── <span class="tree-python">browser_use_client.py</span> <span class="text-slate-600"># browser-use客户端</span>
+│   │   ├── <span class="tree-python">agent_service.py</span>      <span class="text-slate-600"># Agent服务层</span>
+│   │   └── <span class="tree-python">fallback_policy.py</span>   <span class="text-slate-600"># 失败回退策略</span>
+│   │
+│   ├── 📁 <span class="tree-folder">elements/</span>
+│   │   ├── <span class="tree-python">smart_locator.py</span>      <span class="text-slate-600"># 智能定位器</span>
+│   │   └── <span class="tree-python">self_healing.py</span>       <span class="text-slate-600"># 自我修复</span>
+│   │
+│   ├── 📁 <span class="tree-folder">reporting/</span>
+│   │   └── <span class="tree-python">allure_helper.py</span>      <span class="text-slate-600"># Allure增强</span>
+│   │
+│   └── 📁 <span class="tree-folder">security/</span>
+│       ├── <span class="tree-python">secret_provider.py</span>    <span class="text-slate-600"># 密钥管理</span>
+│       └── <span class="tree-python">pii_filter.py</span>         <span class="text-slate-600"># 敏感信息过滤</span>
+│
+├── 📁 <span class="tree-folder">pages/</span>                     <span class="text-slate-600"># 页面对象</span>
+│   ├── <span class="tree-python">base_page.py</span>            <span class="text-slate-600"># 基础页面对象</span>
+│   ├── <span class="tree-python">ai_page.py</span>              <span class="text-slate-600"># AI增强页面</span>
+│   └── 📁 <span class="tree-folder">components/</span>           <span class="text-slate-600"># 可复用组件</span>
+│
+├── 📁 <span class="tree-folder">flows/</span>                     <span class="text-slate-600"># 业务流程</span>
+│   ├── <span class="tree-python">auth_flow.py</span>            <span class="text-slate-600"># 认证流程</span>
+│   └── <span class="tree-python">order_flow.py</span>           <span class="text-slate-600"># 订单流程</span>
+│
+├── 📁 <span class="tree-folder">tests/</span>                     <span class="text-slate-600"># 测试用例</span>
+│   ├── 📁 <span class="tree-folder">e2e/</span>
+│   │   ├── 📁 <span class="tree-folder">smoke/</span>              <span class="text-slate-600"># 冒烟测试</span>
+│   │   └── 📁 <span class="tree-folder">regression/</span>         <span class="text-slate-600"># 回归测试</span>
+│   │
+│   ├── 📁 <span class="tree-folder">ai_driven/</span>             <span class="text-slate-600"># AI驱动测试</span>
+│   ├── 📁 <span class="tree-folder">hybrid/</span>                <span class="text-slate-600"># 混合测试</span>
+│   └── <span class="tree-python">conftest.py</span>            <span class="text-slate-600"># pytest配置</span>
+│
+├── 📁 <span class="tree-folder">data/</span>                      <span class="text-slate-600"># 测试数据</span>
+├── 📁 <span class="tree-folder">scripts/</span>                   <span class="text-slate-600"># 执行脚本</span>
+└── 📁 <span class="tree-folder">reports/</span>                   <span class="text-slate-600"># 测试报告</span>
+</pre>
+                    </div>
+                </div>
+
+                <!-- Module Details -->
+                <div class="space-y-4">
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                <span class="text-blue-400 font-bold">01</span>
+                            </div>
+                            <h4 class="font-bold text-lg">core/playwright/</h4>
+                        </div>
+                        <p class="text-slate-400 text-sm">
+                            浏览器生命周期管理、上下文工厂、页面保护（超时/异常处理）、等待策略封装。确保 Playwright 引擎稳定可靠运行。
+                        </p>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                <span class="text-purple-400 font-bold">02</span>
+                            </div>
+                            <h4 class="font-bold text-lg">core/ai/</h4>
+                        </div>
+                        <p class="text-slate-400 text-sm">
+                            browser-use 客户端封装、Agent 服务层（模式控制、域名限制）、提示词模板、自定义工具注册、失败回退策略。
+                        </p>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                <span class="text-green-400 font-bold">03</span>
+                            </div>
+                            <h4 class="font-bold text-lg">core/elements/</h4>
+                        </div>
+                        <p class="text-slate-400 text-sm">
+                            智能定位器（多策略降级）、自我修复定位（AI辅助）、元素变更监听。当传统定位失败时自动寻找替代方案。
+                        </p>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center">
+                                <span class="text-pink-400 font-bold">04</span>
+                            </div>
+                            <h4 class="font-bold text-lg">pages/ & flows/</h4>
+                        </div>
+                        <p class="text-slate-400 text-sm">
+                            PageObject 分层：BasePage（传统）、AIPage（双模式）、FlowObject（业务流程封装）。减少测试脚本重复。
+                        </p>
+                    </div>
+
+                    <div class="glass-card rounded-xl p-5 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                                <span class="text-orange-400 font-bold">05</span>
+                            </div>
+                            <h4 class="font-bold text-lg">tests/ 分层</h4>
+                        </div>
+                        <p class="text-slate-400 text-sm">
+                            e2e/smoke（冒烟）、e2e/regression（回归）、ai_driven（AI探索）、hybrid（混合）。通过 pytest marker 灵活选择执行。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Strategy -->
+    <section id="ai-strategy" class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">AI 增强策略</h2>
+            <p class="text-slate-400 text-center mb-12">增强层而非替代层，渐进式应用 AI 能力</p>
+
+            <div class="glass-card rounded-2xl p-8 border border-slate-700/50 mb-8">
+                <div class="mermaid">
+flowchart TB
+    subgraph Stable["稳定回归主干（Playwright）"]
+        S1["确定性场景<br/>登录、支付、核心业务"]
+        S2["高频执行<br/>smoke、regression"]
+        S3["门禁阻塞<br/>失败必须修复"]
+    end
+
+    subgraph AI["AI 增强层（browser-use）"]
+        A1["探索式测试<br/>发现未知问题"]
+        A2["弱自愈辅助<br/>定位失败建议"]
+        A3["复杂易变场景<br/>频繁改版功能"]
+        A4["智能工具<br/>OTP读取、邮件校验"]
+    end
+
+    Stable -.->|备选方案| AI
+
+    style Stable fill:#064e3b,stroke:#22c55e
+    style AI fill:#3d1e5f,stroke:#8b5cf6
+                </div>
+            </div>
+
+            <!-- Three Modes -->
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-card rounded-2xl p-6 border border-slate-700/50 gradient-border">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                            <span class="text-blue-400 font-bold">1</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-blue-400">assist</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">推荐默认模式，AI 只给建议，不直接执行</p>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-400">✓</span>
+                            <span>定位失败时返回候选定位器</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-400">✓</span>
+                            <span>报告中附加 AI 分析结果</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-400">✓</span>
+                            <span>安全性最高，适合生产环境</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 border border-slate-700/50 gradient-border">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center">
+                            <span class="text-purple-400 font-bold">2</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-purple-400">semi-auto</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">受控执行模式，AI 可执行白名单内的动作</p>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li class="flex items-start gap-2">
+                            <span class="text-purple-400">✓</span>
+                            <span>域名白名单限制</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-purple-400">✓</span>
+                            <span>动作白名单限制</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-purple-400">✓</span>
+                            <span>适合混合测试场景</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 border border-slate-700/50 gradient-border">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center">
+                            <span class="text-pink-400 font-bold">3</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-pink-400">agent</h3>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-4">纯探索模式，AI 完全自主探索</p>
+                    <ul class="space-y-2 text-xs text-slate-500">
+                        <li class="flex items-start gap-2">
+                            <span class="text-pink-400">✓</span>
+                            <span>用于问题复现、边界探索</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-pink-400">✓</span>
+                            <span>仅用于 ai_explore 测试集</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-pink-400">✓</span>
+                            <span>需要严格监控</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Smart Locator Implementation -->
+            <div class="glass-card rounded-2xl border border-slate-700/50 overflow-hidden">
+                <div class="bg-slate-900 px-6 py-4 border-b border-slate-700">
+                    <span class="text-sm font-medium text-slate-400">SmartLocator 智能定位器实现</span>
+                </div>
+                <div class="p-6 overflow-x-auto">
+                    <pre><code class="language-python">class SmartLocator:
+    """智能元素定位器 - 多策略降级"""
+
+    def find(self, selector: str, fallback_selectors: List[str] = None,
+             ai_description: str = None) -> Locator:
+        """
+        智能查找元素:
+        1. 优先使用传统选择器（快速、稳定）
+        2. 失败时尝试备用选择器列表
+        3. 启用AI时，使用AI视觉定位
+        4. 记录成功定位历史，优化后续查找
+        """
+        # 策略1: 尝试主选择器
+        try:
+            locator = self.page.locator(selector)
+            if locator.count() > 0:
+                self._update_success_history(selector)
+                return locator.first
+        except:
+            pass
+
+        # 策略2: 尝试备用选择器
+        if fallback_selectors:
+            for fb_selector in fallback_selectors:
+                try:
+                    locator = self.page.locator(fb_selector)
+                    if locator.count() > 0:
+                        self._update_success_history(fb_selector)
+                        return locator.first
+                except:
+                    continue
+
+        # 策略3: AI视觉定位
+        if ai_description and self.ai:
+            return self._ai_find(ai_description)
+
+        raise ElementNotFoundException(f"无法定位元素: {selector}")</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Implementation -->
+    <section id="implementation" class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">核心模块实现</h2>
+            <p class="text-slate-400 text-center mb-12">关键代码示例与实现思路</p>
+
+            <!-- Tab Navigation -->
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <button onclick="switchTab('pageobject')" id="tab-pageobject" class="tab-btn px-5 py-2.5 rounded-xl font-medium transition-all active">AIPage</button>
+                <button onclick="switchTab('agentservice')" id="tab-agentservice" class="tab-btn px-5 py-2.5 rounded-xl font-medium transition-all bg-slate-800 hover:bg-slate-700">AgentService</button>
+                <button onclick="switchTab('allure')" id="tab-allure" class="tab-btn px-5 py-2.5 rounded-xl font-medium transition-all bg-slate-800 hover:bg-slate-700">Allure Helper</button>
+                <button onclick="switchTab('config')" id="tab-config" class="tab-btn px-5 py-2.5 rounded-xl font-medium transition-all bg-slate-800 hover:bg-slate-700">配置管理</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div class="glass-card rounded-2xl border border-slate-700/50 overflow-hidden">
+                <!-- AIPage -->
+                <div id="content-pageobject" class="tab-content active">
+                    <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-400">pages/ai_page.py - 双模式页面对象</span>
+                        <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs">双模式支持</span>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre><code class="language-python">class AIPage:
+    """AI增强的基础页面对象 - 支持传统和AI两种模式"""
+
+    def __init__(self, page: Page, ai_client: Optional[BrowserUseClient] = None):
+        self.page = page
+        self.ai = ai_client
+        self._smart_mode = ai_client is not None
+
+    # ========== 传统模式方法 ==========
+    def click(self, selector: str):
+        """传统点击操作"""
+        self.page.click(selector)
+
+    def fill(self, selector: str, value: str):
+        """传统输入操作"""
+        self.page.fill(selector, value)
+
+    # ========== AI模式方法 ==========
+    async def ai_click(self, element_description: str):
+        """
+        AI驱动的点击 - 通过自然语言描述定位元素
+
+        Args:
+            element_description: 元素的自然语言描述
+            例如: "红色的提交按钮", "显示'下一步'的链接"
+        """
+        if not self._smart_mode:
+            raise RuntimeError("AI client not initialized")
+
+        task = f"在页面上找到 '{element_description}' 并点击它"
+        return await self.ai.execute_task(task)
+
+    async def ai_fill_form(self, form_data: dict):
+        """AI驱动的表单填写"""
+        fields = ", ".join([f"{k}={v}" for k, v in form_data.items()])
+        task = f"填写表单，字段值: {fields}"
+        return await self.ai.execute_task(task)
+
+    async def ai_verify(self, expectation: str) -> bool:
+        """AI驱动的验证 - 自然语言断言"""
+        task = f"验证页面是否符合预期: {expectation}"
+        result = await self.ai.execute_task(task)
+        return result.get("success", False)</code></pre>
+                    </div>
+                </div>
+
+                <!-- AgentService -->
+                <div id="content-agentservice" class="tab-content">
+                    <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-400">core/ai/agent_service.py - AI控制点设计</span>
+                        <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs">安全控制</span>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre><code class="language-python">class AgentService:
+    """AI Agent服务层 - 统一管理AI调用（带控制点）"""
+
+    def __init__(self, config: dict):
+        self.mode = config.get("ai_mode", "assist")
+        self.max_steps = config.get("ai_max_steps", 30)
+        self.allowed_domains = config.get("ai_allowed_domains", [])
+        self.llm = self._create_llm(config.get("llm_provider", "openai"))
+
+    async def execute_task(self, task: str, context: dict = None, use_vision: bool = True):
+        """执行AI任务（带控制点）"""
+        # 控制点1: 检查模式
+        if self.mode == "assist":
+            return await self._assist_mode(task, context)
+
+        # 控制点2: 域名限制
+        if self.allowed_domains:
+            self._validate_allowed_domains()
+
+        # 控制点3: 步骤限制
+        agent = Agent(
+            task=task,
+            llm=self.llm,
+            browser=self.browser,
+            use_vision=use_vision,
+            max_steps=self.max_steps,  # 关键控制点
+        )
+
+        try:
+            result = await agent.run()
+            return self._format_result(result)
+        except Exception as e:
+            return self._handle_failure(e, task)
+
+    def _create_llm(self, provider: str):
+        """支持多LLM后端"""
+        llm_map = {
+            "openai": ChatOpenAI(model="gpt-4o", temperature=0.1),
+            "anthropic": ChatAnthropic(model="claude-3-5-sonnet-20241022"),
+            "local": ChatOllama(model="llama3.2"),
+        }
+        return llm_map.get(provider)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Allure Helper -->
+                <div id="content-allure" class="tab-content">
+                    <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-400">core/reporting/allure_helper.py - 证据链管理</span>
+                        <span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs">证据充分</span>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre><code class="language-python">class AllureHelper:
+    """Allure报告增强工具 - 完整证据链"""
+
+    @staticmethod
+    def attach_screenshot(page, name: str = "截图"):
+        """附加失败截图 (PNG)"""
+        allure.attach(page.screenshot(), name=name,
+                      attachment_type=AttachmentType.PNG)
+
+    @staticmethod
+    def attach_page_source(page, name: str = "页面源码"):
+        """附加页面DOM快照 (HTML)"""
+        allure.attach(page.content(), name=name,
+                      attachment_type=AttachmentType.HTML)
+
+    @staticmethod
+    def attach_trace(trace_path: Path):
+        """附加Playwright Trace (zip)"""
+        with open(trace_path, "rb") as f:
+            allure.attach(f.read(), name="Playwright Trace",
+                         attachment_type=AttachmentType.ZIP, extension="zip")
+
+    @staticmethod
+    def attach_video(video_path: Path):
+        """附加视频录制 (MP4)"""
+        with open(video_path, "rb") as f:
+            allure.attach(f.read(), name="执行视频",
+                         attachment_type=AttachmentType.MP4, extension="mp4")
+
+    @staticmethod
+    def attach_ai_execution(task: str, result: dict):
+        """附加AI执行详情 (JSON)"""
+        ai_report = {
+            "task": task,
+            "success": result.get("success"),
+            "steps_taken": result.get("steps_taken"),
+            "history": result.get("history", []),
+        }
+        allure.attach(json.dumps(ai_report, indent=2),
+                     name="AI执行详情",
+                     attachment_type=AttachmentType.JSON)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Config -->
+                <div id="content-config" class="tab-content">
+                    <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                        <span class="text-sm font-medium text-slate-400">config/settings.py - 多环境配置管理</span>
+                        <span class="px-3 py-1 rounded-full bg-orange-500/20 text-orange-400 text-xs">环境隔离</span>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <pre><code class="language-python">class Settings:
+    """全局配置管理器 - 环境变量 + YAML配置"""
+
+    def __init__(self):
+        # 加载.env文件
+        load_dotenv()
+
+        # 加载环境配置
+        env = os.getenv("TEST_ENV", "dev")
+        config_file = Path(__file__).parent / f"env.{env}.yaml"
+
+        with open(config_file) as f:
+            self.config = yaml.safe_load(f)
+
+        # 合并环境变量（优先级更高）
+        self._merge_env_vars()
+
+    def _merge_env_vars(self):
+        """环境变量覆盖配置文件"""
+        if os.getenv("BASE_URL"):
+            self.config["base_url"] = os.getenv("BASE_URL")
+        if os.getenv("AI_MODE"):
+            self.config.setdefault("ai", {})["mode"] = os.getenv("AI_MODE")
+
+    def get(self, key: str, default=None):
+        """获取配置值（支持点号路径）"""
+        keys = key.split(".")
+        value = self.config
+        for k in keys:
+            if isinstance(value, dict):
+                value = value.get(k)
+            else:
+                return default
+        return value if value is not None else default</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CI/CD Integration -->
+    <section class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">CI/CD 集成</h2>
+            <p class="text-slate-400 text-center mb-12">分层门禁策略与自动化流水线</p>
+
+            <!-- CI/CD Flow -->
+            <div class="glass-card rounded-2xl p-8 border border-slate-700/50 mb-8">
+                <div class="mermaid">
+flowchart LR
+    subgraph PR["PR阶段（快速反馈）"]
+        P1["smoke测试<br/>5分钟内"]
+        P2["lint检查"]
+        P3["失败策略<br/>阻塞合并"]
+    end
+
+    subgraph Nightly["Nightly阶段（深度验证）"]
+        N1["regression测试<br/>30-60分钟"]
+        N2["ai_explore测试<br/>可选"]
+        N3["失败策略<br/>告警通知"]
+    end
+
+    subgraph Release["Release阶段（质量保障）"]
+        R1["全量regression测试"]
+        R2["跨浏览器测试<br/>Chromium/Firefox/WebKit"]
+        R3["失败策略<br/>阻塞发布"]
+    end
+
+    PR --> Nightly --> Release
+
+    style PR fill:#1e3a5f,stroke:#3b82f6
+    style Nightly fill:#3d1e5f,stroke:#8b5cf6
+    style Release fill:#1e3d2f,stroke:#22c55e
+                </div>
+            </div>
+
+            <!-- Environment Variables -->
+            <div class="glass-card rounded-2xl border border-slate-700/50 overflow-hidden">
+                <div class="bg-slate-900 px-6 py-4 border-b border-slate-700 flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-400">.env.example - 环境变量配置</span>
+                    <span class="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs">安全配置</span>
+                </div>
+                <div class="p-6 overflow-x-auto">
+                    <pre><code class="language-bash"># ========== Playwright / Runtime ==========
+BASE_URL=https://example.test
+HEADLESS=false
+BROWSER=chromium
+TIMEOUT_MS=15000
+
+# ========== Allure ==========
+ALLURE_RESULTS_DIR=reports/allure-results
+
+# ========== Browser-Use AI ==========
+LLM_PROVIDER=openai  # openai / anthropic / local
+
+OPENAI_API_KEY=sk-xxx
+OPENAI_MODEL=gpt-4o
+
+ANTHROPIC_API_KEY=sk-ant-xxx
+ANTHROPIC_MODEL=claude-3-5-sonnet-20241022
+
+# AI 控制
+AI_MODE=assist              # assist / semi-auto / agent
+AI_MAX_STEPS=30
+AI_ALLOWED_DOMAINS=example.test,api.example.test
+AI_USE_VISION=true
+ANONYMIZED_TELEMETRY=false
+
+# ========== 安全 ==========
+ENABLE_PII_FILTER=true
+SECRET_PROVIDER=env         # env / vault / aws-secrets</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Roadmap -->
+    <section id="roadmap" class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">分阶段实施路线</h2>
+            <p class="text-slate-400 text-center mb-12">从骨架到智能化的演进路径</p>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Phase 1 -->
+                <div class="timeline-item">
+                    <div class="glass-card rounded-2xl p-6 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center">
+                                <span class="text-2xl font-bold text-blue-400">1</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-blue-400">基础框架</h3>
+                                <span class="text-sm text-slate-500">2-3周</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 text-sm mb-4">跑通 Playwright + pytest + Allure 最小闭环</p>
+                        <ul class="space-y-2">
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>项目结构搭建</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>pytest 配置与 fixture 设计</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>PageObject 基类实现</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>Allure 报告集成</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>CI 集成（smoke 测试）</span>
+                            </li>
+                        </ul>
+                        <div class="mt-4 p-3 rounded-lg bg-blue-500/10 text-xs text-blue-300">
+                            <strong>验收标准：</strong>smoke 测试可在本地和 CI 稳定执行，失败用例有完整证据链
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="timeline-item">
+                    <div class="glass-card rounded-2xl p-6 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
+                                <span class="text-2xl font-bold text-purple-400">2</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-purple-400">AI 增强</h3>
+                                <span class="text-sm text-slate-500">3-4周</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 text-sm mb-4">接入 browser-use，建立 AI 辅助能力</p>
+                        <ul class="space-y-2">
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-purple-400">☐</span>
+                                <span>browser-use 客户端封装</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-purple-400">☐</span>
+                                <span>AgentService 实现</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-purple-400">☐</span>
+                                <span>AIPage 双模式页面对象</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-purple-400">☐</span>
+                                <span>SmartLocator 智能定位器</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-purple-400">☐</span>
+                                <span>AI 探索测试示例</span>
+                            </li>
+                        </ul>
+                        <div class="mt-4 p-3 rounded-lg bg-purple-500/10 text-xs text-purple-300">
+                            <strong>验收标准：</strong>AI assist 模式可给出定位失败修复建议
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="timeline-item">
+                    <div class="glass-card rounded-2xl p-6 border border-slate-700/50">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                                <span class="text-2xl font-bold text-green-400">3</span>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-green-400">体系化</h3>
+                                <span class="text-sm text-slate-500">4-6周</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 text-sm mb-4">建立完整测试体系与质量度量</p>
+                        <ul class="space-y-2">
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>SelfHealingLocator 自我修复</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>自定义 AI 工具（OTP/邮件）</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>flaky 测试检测与重跑</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>测试稳定性看板</span>
+                            </li>
+                            <li class="checklist-item flex items-center gap-2 text-sm text-slate-300 cursor-pointer" onclick="this.classList.toggle('checked')">
+                                <span class="text-green-400">☐</span>
+                                <span>多 LLM 支持</span>
+                            </li>
+                        </ul>
+                        <div class="mt-4 p-3 rounded-lg bg-green-500/10 text-xs text-green-300">
+                            <strong>验收标准：</strong>回归测试稳定性 > 95%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Risks -->
+    <section class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">风险与应对</h2>
+            <p class="text-slate-400 text-center mb-12">提前识别风险，制定应对策略</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="risk-card glass-card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                            <span class="text-red-400">⚠️</span>
+                        </div>
+                        <h4 class="font-bold text-lg">AI 不确定性高</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-3">AI 执行结果不稳定，同一任务多次执行结果不同</p>
+                    <ul class="space-y-1 text-xs text-slate-500">
+                        <li>✓ AI 结果不直接作为强门禁（初期仅告警）</li>
+                        <li>✓ 设置 max_steps 限制，避免无限探索</li>
+                        <li>✓ 关键路径仍用传统脚本保障</li>
+                    </ul>
+                </div>
+
+                <div class="risk-card glass-card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                            <span class="text-yellow-400">💰</span>
+                        </div>
+                        <h4 class="font-bold text-lg">运行成本上升</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-3">AI 调用 LLM API 产生费用，并发执行成本高</p>
+                    <ul class="space-y-1 text-xs text-slate-500">
+                        <li>✓ 控制 AI 场景数量（初期 < 10% 测试用例）</li>
+                        <li>✓ 限制并发数（AI 测试串行执行）</li>
+                        <li>✓ 优先使用本地 Ollama（成本为 0）</li>
+                    </ul>
+                </div>
+
+                <div class="risk-card glass-card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                            <span class="text-orange-400">🔍</span>
+                        </div>
+                        <h4 class="font-bold text-lg">调试困难</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-3">AI 失败时难以复现，缺少足够上下文</p>
+                    <ul class="space-y-1 text-xs text-slate-500">
+                        <li>✓ 统一收集 trace/video/AI history</li>
+                        <li>✓ 每个 AI 步骤附加截图</li>
+                        <li>✓ 记录完整的提示词与响应</li>
+                    </ul>
+                </div>
+
+                <div class="risk-card glass-card rounded-xl p-6">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                            <span class="text-blue-400">🔒</span>
+                        </div>
+                        <h4 class="font-bold text-lg">数据安全风险</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm mb-3">AI 可能误操作敏感数据，或泄露到 LLM 日志</p>
+                    <ul class="space-y-1 text-xs text-slate-500">
+                        <li>✓ 敏感数据脱敏（PII Filter）</li>
+                        <li>✓ 域名白名单限制</li>
+                        <li>✓ 关闭 LLM 遥测</li>
+                        <li>✓ 使用本地 Ollama 处理敏感场景</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-4">快速开始</h2>
+            <p class="text-slate-400 text-center mb-12">5 分钟搭建环境并运行第一个测试</p>
+
+            <div class="glass-card rounded-2xl border border-slate-700/50 overflow-hidden">
+                <div class="p-6">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="font-bold mb-4 text-blue-400">1. 环境准备</h4>
+                            <pre class="text-xs"><code class="language-bash"># 克隆仓库
+git clone https://github.com/your-org/automation-framework.git
+cd automation-framework
+
+# 创建虚拟环境
+python3.12 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
+# 安装依赖
+pip install -e .
+playwright install chromium
+
+# 配置环境变量
+cp .env.example .env
+# 编辑.env，填入必要的配置</code></pre>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-4 text-green-400">2. 运行测试</h4>
+                            <pre class="text-xs"><code class="language-bash"># 运行冒烟测试
+./scripts/run_smoke.sh
+
+# 查看 Allure 报告
+allure open reports/allure-report
+
+# 启用 AI 功能
+export OPENAI_API_KEY=sk-xxx
+pytest tests/ai_driven/ -v -m ai</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex justify-center items-center gap-2 mb-4">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+                <span class="font-bold text-xl gradient-text">AutoTest Framework</span>
+            </div>
+            <p class="text-slate-500 text-sm">
+                稳定优先 · 证据充分 · 可控AI · 安全合规
+            </p>
+            <p class="text-slate-600 text-xs mt-2">
+                文档维护者: QA Team · 最后更新: 2026-04-20
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#f1f5f9',
+                primaryBorderColor: '#60a5fa',
+                lineColor: '#64748b',
+                secondaryColor: '#8b5cf6',
+                tertiaryColor: '#ec4899',
+                fontFamily: 'Inter, sans-serif'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // Initialize Highlight.js
+        hljs.highlightAll();
+
+        // Tab Switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById('content-' + tabName).classList.add('active');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('bg-slate-800');
+            });
+            const activeBtn = document.getElementById('tab-' + tabName);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-slate-800');
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Active Navigation Highlight
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
