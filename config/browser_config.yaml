@@ -1,0 +1,60 @@
+# 浏览器配置
+chromium:
+  headless: false
+  slow_mo: 50
+  viewport:
+    width: 1920
+    height: 1080
+  args:
+    - "--no-sandbox"
+    - "--disable-dev-shm-usage"
+    - "--disable-gpu"
+  downloads_path: "./downloads"
+
+firefox:
+  headless: false
+  slow_mo: 50
+  viewport:
+    width: 1920
+    height: 1080
+  firefox_user_prefs:
+    "browser.download.folderList": 2
+    "browser.download.dir": "./downloads"
+
+webkit:
+  headless: false
+  slow_mo: 50
+  viewport:
+    width: 1920
+    height: 1080
+
+# 上下文配置
+context:
+  locale: "zh-CN"
+  timezone_id: "Asia/Shanghai"
+  permissions:
+    - "geolocation"
+  geolocation:
+    latitude: 31.2304
+    longitude: 121.4737
+  color_scheme: "light"
+
+# 移动端配置
+mobile:
+  iphone_14:
+    user_agent: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)"
+    viewport:
+      width: 390
+      height: 844
+    device_scale_factor: 3
+    is_mobile: true
+    has_touch: true
+
+  pixel_7:
+    user_agent: "Mozilla/5.0 (Linux; Android 13; Pixel 7)"
+    viewport:
+      width: 412
+      height: 915
+    device_scale_factor: 2.625
+    is_mobile: true
+    has_touch: true

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 3: AI 能力 - Playwright AI 框架</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .step-card { transition: all 0.3s ease; }
+        .step-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .day-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .code-block { background: #282c34; border-radius: 8px; overflow: hidden; }
+        .nav-link { transition: all 0.2s; }
+        .nav-link:hover { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .nav-link.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .ai-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .openai-box { background: linear-gradient(135deg, #10a37f 0%, #0d8c6d 100%); }
+        .anthropic-box { background: linear-gradient(135deg, #d4a574 0%, #c9956a 100%); }
+        .ollama-box { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%); }
+        .kimi-box { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+        .deepseek-box { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 顶部导航 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="../../index.html" class="text-gray-700 hover:text-indigo-600 mr-4">
+                        <i class="fas fa-arrow-left"></i> 返回首页
+                    </a>
+                    <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        Week 3: AI 能力
+                    </span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="../week2-advanced/index.html" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left"></i> Week 2
+                    </a>
+                    <a href="../week4-project/index.html" class="text-gray-600 hover:text-indigo-600">
+                        Week 4 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex max-w-7xl mx-auto">
+        <!-- 侧边导航 -->
+        <aside class="w-64 bg-white shadow-md min-h-screen sticky top-16 hidden md:block">
+            <div class="p-4">
+                <h3 class="font-bold text-gray-700 mb-4">本周内容</h3>
+                <nav class="space-y-2">
+                    <a href="#overview" class="nav-link block px-4 py-2 rounded-lg text-sm">概览</a>
+                    <a href="#day1" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 1-2: AI 配置</a>
+                    <a href="#day3" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 3-4: 自然语言测试</a>
+                    <a href="#day5" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 5-6: 混合模式</a>
+                    <a href="#day7" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 7: 最佳实践</a>
+                    <a href="#homework" class="nav-link block px-4 py-2 rounded-lg text-sm">作业清单</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 p-8">
+            <!-- 概览 -->
+            <section id="overview" class="mb-12">
+                <div class="ai-gradient rounded-2xl shadow-xl p-8 text-white">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-3xl font-bold">3</div>
+                        <div>
+                            <h1 class="text-3xl font-bold">Week 3: AI 能力</h1>
+                            <p class="text-indigo-100">智能化测试实践</p>
+                        </div>
+                    </div>
+                    <p class="text-lg opacity-90">本周目标：掌握 AI 驱动测试，学会使用自然语言描述测试，理解 AI 与传统测试的结合</p>
+                </div>
+
+                <!-- 学习路线图 -->
+                <div class="mt-8 grid md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">1-2</div>
+                        <h3 class="font-bold text-gray-800">AI 环境配置</h3>
+                        <p class="text-sm text-gray-600 mt-2">配置 API 密钥</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">3-4</div>
+                        <h3 class="font-bold text-gray-800">自然语言测试</h3>
+                        <p class="text-sm text-gray-600 mt-2">用自然语言写测试</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">5-6</div>
+                        <h3 class="font-bold text-gray-800">混合模式</h3>
+                        <p class="text-sm text-gray-600 mt-2">传统+AI结合</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">7</div>
+                        <h3 class="font-bold text-gray-800">最佳实践</h3>
+                        <p class="text-sm text-gray-600 mt-2">成本优化技巧</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 1-2: AI 配置 -->
+            <section id="day1" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">1-2</div>
+                        <h2 class="text-2xl font-bold text-gray-800">AI 环境配置与核心组件</h2>
+                    </div>
+
+                    <div class="prose max-w-none text-gray-600 mb-6">
+                        <p class="text-lg">要使用 AI 测试能力，首先需要配置 LLM（大语言模型）的 API 密钥。我们支持多种提供商：<strong>OpenAI、Anthropic Claude、Kimi、DeepSeek</strong> 和本地 Ollama。国内用户推荐使用 Kimi 或 DeepSeek，访问速度快且价格实惠。</p>
+                    </div>
+
+                    <!-- LLM 提供商对比 -->
+                    <div class="grid md:grid-cols-5 gap-4 mb-6">
+                        <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+                            <div class="openai-box w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold mb-3">OpenAI</div>
+                            <h3 class="font-bold text-gray-800 mb-2">推荐新手</h3>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>✓ 能力最强</li>
+                                <li>✓ 速度快</li>
+                                <li>✗ 需要付费</li>
+                            </ul>
+                            <a href="https://platform.openai.com/" target="_blank" class="text-green-600 text-sm hover:underline">获取 API Key →</a>
+                        </div>
+                        <div class="bg-amber-50 rounded-xl p-6 border border-amber-200">
+                            <div class="anthropic-box w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold mb-3">Claude</div>
+                            <h3 class="font-bold text-gray-800 mb-2">推理能力强</h3>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>✓ 推理能力强</li>
+                                <li>✓ 稳定性好</li>
+                                <li>✗ 价格较高</li>
+                            </ul>
+                            <a href="https://console.anthropic.com/" target="_blank" class="text-amber-600 text-sm hover:underline">获取 API Key →</a>
+                        </div>
+                        <div class="bg-red-50 rounded-xl p-6 border border-red-200">
+                            <div class="ollama-box w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold mb-3 text-xs">Ollama</div>
+                            <h3 class="font-bold text-gray-800 mb-2">免费方案</h3>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>✓ 完全免费</li>
+                                <li>✓ 数据私密</li>
+                                <li>✗ 需要硬件资源</li>
+                            </ul>
+                            <a href="https://ollama.com/download" target="_blank" class="text-red-600 text-sm hover:underline">下载 Ollama →</a>
+                        </div>
+                        <div class="bg-indigo-50 rounded-xl p-6 border border-indigo-200">
+                            <div class="kimi-box w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold mb-3 text-xs">Kimi</div>
+                            <h3 class="font-bold text-gray-800 mb-2">国内推荐</h3>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>✓ 国内访问快</li>
+                                <li>✓ 中文理解好</li>
+                                <li>✓ 价格实惠</li>
+                            </ul>
+                            <a href="https://platform.moonshot.cn/" target="_blank" class="text-indigo-600 text-sm hover:underline">获取 API Key →</a>
+                        </div>
+                        <div class="bg-sky-50 rounded-xl p-6 border border-sky-200">
+                            <div class="deepseek-box w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold mb-3 text-xs">DeepSeek</div>
+                            <h3 class="font-bold text-gray-800 mb-2">性价比之选</h3>
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li>✓ 价格便宜</li>
+                                <li>✓ 国内访问快</li>
+                                <li>✓ 推理能力强</li>
+                            </ul>
+                            <a href="https://platform.deepseek.com/" target="_blank" class="text-sky-600 text-sm hover:underline">获取 API Key →</a>
+                        </div>
+                    </div>
+
+                    <!-- 配置步骤 -->
+                    <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-cog text-indigo-600"></i> 配置步骤
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-bash"># 1. 创建 .env 文件
+touch .env
+
+# 2. 添加 API 密钥（选择一种即可）
+# OpenAI（国际）
+echo "OPENAI_API_KEY=sk-your-key-here" >> .env
+
+# Anthropic（国际）
+echo "ANTHROPIC_API_KEY=sk-ant-your-key-here" >> .env
+
+# Kimi - Moonshot AI（国内推荐）
+echo "KIMI_API_KEY=your-kimi-key-here" >> .env
+
+# DeepSeek（国内推荐，性价比高）
+echo "DEEPSEEK_API_KEY=your-deepseek-key-here" >> .env
+
+# Ollama 本地（免费）
+echo "OLLAMA_BASE_URL=http://localhost:11434" >> .env</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- AIAgentAdapter -->
+                    <div class="bg-indigo-50 rounded-xl p-6">
+                        <h3 class="font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-robot"></i> AIAgentAdapter 核心组件
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from core.driver.browser_use_adapter import AIAgentAdapter
+
+# 1. 创建适配器
+adapter = AIAgentAdapter(
+    llm_provider="kimi",      # 选择 LLM 提供商：openai/anthropic/kimi/deepseek/local
+    headless=False,           # 是否无头模式
+    use_vision=True,          # 是否启用视觉能力
+    max_iterations=50         # 最大迭代次数
+)
+
+# 2. 执行自然语言任务
+result = await adapter.execute_task(
+    task="在搜索框输入'Python教程'并点击搜索"
+)
+
+# 3. 检查结果
+print(f"成功: {result.success}")
+print(f"步骤: {result.steps}")
+
+# 4. 关闭适配器
+await adapter.close()</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 3-4: 自然语言测试 -->
+            <section id="day3" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">3-4</div>
+                        <h2 class="text-2xl font-bold text-gray-800">自然语言测试编写</h2>
+                    </div>
+
+                    <div class="prose max-w-none text-gray-600 mb-6">
+                        <p class="text-lg">AI 测试的最大优势是：你只需要用自然语言描述要做什么，AI 会自动帮你完成！</p>
+                    </div>
+
+                    <!-- 对比示例 -->
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-gray-100 rounded-xl p-6">
+                            <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                                <i class="fas fa-code"></i> 传统测试
+                            </h3>
+                            <div class="code-block">
+                                <pre><code class="language-python">def test_login_traditional(page):
+    # 必须知道具体的选择器
+    page.goto("https://example.com/login")
+    page.fill("#username", "test")
+    page.fill("#password", "pass")
+    page.click("button[type='submit']")
+    expect(page).to_have_url("/dashboard")</code></pre>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+                            <h3 class="font-bold text-green-800 mb-3 flex items-center gap-2">
+                                <i class="fas fa-magic"></i> AI 测试
+                            </h3>
+                            <div class="code-block">
+                                <pre><code class="language-python">async def test_login_ai(async_ai_agent, async_page):
+    # 只需描述要做什么
+    await async_page.goto("https://example.com/login")
+
+    result = await async_ai_agent.execute_task("""
+        使用用户名 test 和密码 pass 登录系统，
+        验证登录成功后跳转到仪表盘页面
+    """)
+
+    assert result.success</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI 测试示例 -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-flask text-indigo-600"></i> 完整的 AI 测试示例
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@pytest.mark.ai
+@allure.feature("AI 基础测试")
+class TestAIBasics:
+    """AI 测试入门示例"""
+
+    @allure.title("AI 自动完成百度搜索")
+    async def test_ai_baidu_search(self, async_ai_agent, async_page):
+        """测试 AI 自动完成百度搜索流程"""
+        # 1. 打开百度
+        await async_page.goto("https://www.baidu.com")
+
+        # 2. 让 AI 执行任务（只需说人话！）
+        result = await async_ai_agent.execute_task("""
+            在搜索框输入"Python自动化测试"，
+            然后点击"百度一下"按钮进行搜索
+        """)
+
+        # 3. 验证成功
+        assert result.success, f"任务失败: {result.errors}"
+
+    @allure.title("AI 完成复杂表单填写")
+    async def test_ai_fill_form(self, async_ai_agent, async_page):
+        """测试 AI 自动填写复杂表单"""
+        await async_page.goto("https://example.com/register")
+
+        result = await async_ai_agent.execute_task(
+            task="填写用户注册表单",
+            context={
+                "user_info": {
+                    "username": "testuser123",
+                    "email": "test@example.com",
+                    "password": "TestPass123!"
+                },
+                "requirements": [
+                    "用户名至少6位",
+                    "密码需要包含大小写字母和数字",
+                    "必须同意用户协议"
+                ]
+            }
+        )
+
+        assert result.success</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- 复杂场景 -->
+                    <div class="bg-purple-50 rounded-xl p-6">
+                        <h3 class="font-bold text-purple-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-shopping-cart"></i> 复杂场景：完整购物流程
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@allure.title("AI 完成完整购物流程")
+async def test_ai_shopping_journey(self, async_ai_agent, async_page):
+    """让 AI 完成从浏览到下单的完整流程"""
+    await async_page.goto("https://example-shop.com")
+
+    result = await async_ai_agent.execute_task("""
+        完成以下购物流程：
+        1. 在首页搜索框输入"无线耳机"
+        2. 选择第一个搜索结果
+        3. 选择颜色为黑色，数量为2
+        4. 点击"加入购物车"
+        5. 进入购物车查看
+        6. 点击"去结算"
+        7. 填写收货地址（使用测试地址）
+        8. 选择支付方式为"支付宝"
+        9. 确认订单
+        10. 验证订单提交成功，记录订单号
+    """)
+
+    assert result.success
+    assert "订单号" in str(result.steps)</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 5-6: 混合模式 -->
+            <section id="day5" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">5-6</div>
+                        <h2 class="text-2xl font-bold text-gray-800">混合模式测试实践</h2>
+                    </div>
+
+                    <div class="prose max-w-none text-gray-600 mb-6">
+                        <p class="text-lg">AI 测试虽然智能，但也有缺点：执行慢、成本高、稳定性不如传统测试。<strong>混合模式</strong>让你取长补短，稳定流程用传统方式，易变流程用 AI 方式。</p>
+                    </div>
+
+                    <!-- 为什么混合 -->
+                    <div class="bg-amber-50 rounded-xl p-6 mb-6 border border-amber-200">
+                        <h3 class="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-balance-scale"></i> 为什么要混合模式？
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-2">AI 测试的缺点</h4>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• 执行速度慢（需要 AI 推理）</li>
+                                    <li>• API 调用成本高</li>
+                                    <li>• 结果不如传统测试稳定</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-2">混合模式优势</h4>
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li>• 稳定流程用传统方式（快速可靠）</li>
+                                    <li>• 易变流程用 AI 方式（自适应）</li>
+                                    <li>• 复杂验证用 AI 方式（智能判断）</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AIPage 双模式 -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-layer-group text-indigo-600"></i> AIPage 双模式页面对象
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from pages.ai_page import AIPage
+
+class TestHybrid:
+    """混合模式测试示例"""
+
+    async def test_login_with_ai_verification(self, async_smart_page, async_page):
+        """传统登录 + AI 验证"""
+        smart_page = async_smart_page
+
+        # ========== 传统模式：稳定的登录流程 ==========
+        smart_page.navigate_to("https://example.com/login")
+        smart_page.fill("#username", "test@example.com")
+        smart_page.fill("#password", "TestPass123!")
+        smart_page.click("#submit-btn")
+        smart_page.wait_for_page_load()
+
+        # ========== AI 模式：智能验证登录结果 ==========
+        # AI 可以判断多种登录成功的情况
+        is_logged_in = await smart_page.ai_verify("""
+            用户已成功登录系统，页面上应该显示：
+            - 用户头像或用户名
+            - 退出登录按钮
+            - 个人中心入口
+        """)
+
+        assert is_logged_in</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- 最佳实践 -->
+                    <div class="bg-green-50 rounded-xl p-6">
+                        <h3 class="font-bold text-green-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-check-double"></i> 混合模式最佳实践
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@pytest.mark.hybrid
+class TestHybridBestPractices:
+    """混合模式最佳实践示例"""
+
+    async def test_stable_flow_traditional(self, async_page):
+        """稳定流程优先使用传统方式"""
+        # ✅ 登录流程稳定，用传统方式
+        base = BasePage(async_page)
+        base.navigate_to("https://example.com/login")
+        base.fill("#username", "user")
+        base.fill("#password", "pass")
+        base.click("#login-btn")
+
+        # ✅ 页面跳转验证，用传统方式
+        assert "dashboard" in async_page.url
+
+    async def test_changing_flow_ai(self, async_smart_page, async_page):
+        """易变流程使用 AI 方式"""
+        # ✅ 推荐算法经常变，用 AI 方式
+        smart_page = async_smart_page
+        await async_page.goto("https://example.com/recommendations")
+
+        result = await smart_page.ai_complete_task("""
+            找到"猜你喜欢"区域的商品，
+            选择评分最高的一个商品
+        """)
+        # 即使推荐区域位置变了，AI 也能找到
+
+        assert result.success</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 7: 最佳实践 -->
+            <section id="day7" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">7</div>
+                        <h2 class="text-2xl font-bold text-gray-800">AI 测试最佳实践</h2>
+                    </div>
+
+                    <!-- 提示词优化 -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-comment-dots text-indigo-600"></i> 提示词 (Prompt) 优化技巧
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-red-50 rounded-xl p-4 border border-red-200">
+                                <h4 class="font-bold text-red-800 mb-2">❌ 不好的提示词</h4>
+                                <div class="code-block">
+                                    <pre><code class="language-python">result = await adapter.execute_task("测试登录功能")
+# 太模糊，AI 不知道具体要做什么</code></pre>
+                                </div>
+                            </div>
+                            <div class="bg-green-50 rounded-xl p-4 border border-green-200">
+                                <h4 class="font-bold text-green-800 mb-2">✅ 好的提示词</h4>
+                                <div class="code-block">
+                                    <pre><code class="language-python">result = await adapter.execute_task("""
+    任务：测试用户登录功能
+
+    前置条件：
+    - 当前在登录页面 https://example.com/login
+
+    操作步骤：
+    1. 在用户名输入框填写 "test@example.com"
+    2. 在密码输入框填写 "TestPass123!"
+    3. 点击"登录"按钮
+    4. 等待页面跳转
+
+    期望结果：
+    - 页面跳转到 https://example.com/dashboard
+    - 页面显示用户名 "test"
+    - 显示"欢迎回来"提示
+""")</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 成本优化 -->
+                    <div class="bg-blue-50 rounded-xl p-6 mb-6">
+                        <h3 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-dollar-sign"></i> 成本优化策略
+                        </h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <div class="font-bold text-gray-800 mb-2">策略 1: 选择性使用</div>
+                                <p class="text-sm text-gray-600">只在必要时使用 AI，简单操作用传统方式</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <div class="font-bold text-gray-800 mb-2">策略 2: 批量任务</div>
+                                <p class="text-sm text-gray-600">一次性让 AI 完成多个相关任务，减少 API 调用</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <div class="font-bold text-gray-800 mb-2">策略 3: 本地 LLM</div>
+                                <p class="text-sm text-gray-600">开发测试用本地 Ollama，生产环境用云端</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 常见错误 -->
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-exclamation-circle text-red-500"></i> 常见错误与解决
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-200">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left rounded-tl-lg">错误</th>
+                                        <th class="px-4 py-2 text-left">原因</th>
+                                        <th class="px-4 py-2 text-left rounded-tr-lg">解决方案</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200 bg-white">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">AI 找不到元素</td>
+                                        <td class="px-4 py-2 text-gray-600">描述不够清晰</td>
+                                        <td class="px-4 py-2 text-green-600">提供更多上下文信息</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">AI 操作超时</td>
+                                        <td class="px-4 py-2 text-gray-600">任务太复杂</td>
+                                        <td class="px-4 py-2 text-green-600">拆分成小任务</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">AI 理解错误</td>
+                                        <td class="px-4 py-2 text-gray-600">提示词有歧义</td>
+                                        <td class="px-4 py-2 text-green-600">使用更精确的描述</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-2 font-medium">成本过高</td>
+                                        <td class="px-4 py-2 text-gray-600">调用次数太多</td>
+                                        <td class="px-4 py-2 text-green-600">优化提示词，合并任务</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 作业清单 -->
+            <section id="homework" class="mb-12">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-lg p-8 text-white">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fas fa-clipboard-check"></i> Week 3 作业清单
+                    </h2>
+                    <p class="mb-4 opacity-90">完成以下任务才算 Week 3 毕业：</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>配置好至少一种 AI 环境（OpenAI/Anthropic/Kimi/DeepSeek/Ollama，国内用户推荐 Kimi 或 DeepSeek）</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>编写 3 个纯 AI 驱动测试用例</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>编写 3 个混合模式测试用例</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>优化 AI 提示词，提高执行成功率到 90% 以上</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition md:col-span-2">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>完成 Week 3 综合项目（为电商网站编写 AI 测试套件）</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 本周重点回顾 -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fas fa-lightbulb text-yellow-500"></i> 本周重点回顾
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-brain text-indigo-600"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800">AI 测试核心价值</h4>
+                        <p class="text-sm text-gray-600 mt-2">自然语言描述，降低编写门槛；自适应页面变化，减少维护成本</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-code-branch text-green-600"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800">混合模式精髓</h4>
+                        <p class="text-sm text-gray-600 mt-2">传统方式：稳定流程，快速执行；AI 方式：易变流程，智能适应</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fas fa-coins text-amber-600"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-800">成本优化要点</h4>
+                        <p class="text-sm text-gray-600 mt-2">只在必要时使用 AI，批量任务减少 API 调用，开发用本地，生产用云端</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 下一步 -->
+            <div class="text-center">
+                <a href="../week4-project/index.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-lg transition">
+                    进入 Week 4: 实战项目 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        hljs.highlightAll();
+
+        // 导航高亮
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

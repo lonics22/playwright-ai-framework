@@ -1,0 +1,20 @@
+# 核心依赖
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-xdist>=3.5.0
+playwright>=1.41.0
+allure-pytest>=2.13.0
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+
+# Browser-Use 及 AI 相关
+browser-use>=0.1.0
+langchain>=0.1.0
+langchain-openai>=0.0.5
+langchain-anthropic>=0.1.0
+langchain-ollama>=0.0.1
+
+# 可选：增强功能
+pillow>=10.0.0
+requests>=2.31.0
+faker>=22.0.0

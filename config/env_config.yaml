@@ -1,0 +1,35 @@
+# 环境配置（多环境支持）
+default:
+  base_url: "https://staging.example.com"
+  api_base: "https://api.staging.example.com"
+  timeout: 30000
+  retry_count: 2
+
+production:
+  base_url: "https://example.com"
+  api_base: "https://api.example.com"
+  timeout: 10000
+  retry_count: 1
+
+dev:
+  base_url: "https://dev.example.com"
+  api_base: "https://api.dev.example.com"
+  timeout: 60000
+  retry_count: 3
+
+# AI 配置
+ai:
+  default_provider: "openai"
+  vision_enabled: true
+  max_iterations: 50
+  providers:
+    openai:
+      model: "gpt-4o"
+      temperature: 0.1
+    anthropic:
+      model: "claude-3-5-sonnet"
+      temperature: 0.1
+    local:
+      model: "llama3.2"
+      base_url: "http://localhost:11434"
+      temperature: 0.2

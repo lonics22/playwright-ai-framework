@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1: 基础巩固 - Playwright AI 框架</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .step-card { transition: all 0.3s ease; }
+        .step-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .day-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .code-block { background: #282c34; border-radius: 8px; overflow: hidden; }
+        .nav-link { transition: all 0.2s; }
+        .nav-link:hover { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .nav-link.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 顶部导航 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="../../index.html" class="text-gray-700 hover:text-indigo-600 mr-4">
+                        <i class="fas fa-arrow-left"></i> 返回首页
+                    </a>
+                    <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        Week 1: 基础巩固
+                    </span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="../week2-advanced/index.html" class="text-gray-600 hover:text-indigo-600">
+                        Week 2 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex max-w-7xl mx-auto">
+        <!-- 侧边导航 -->
+        <aside class="w-64 bg-white shadow-md min-h-screen sticky top-16 hidden md:block">
+            <div class="p-4">
+                <h3 class="font-bold text-gray-700 mb-4">本周内容</h3>
+                <nav class="space-y-2">
+                    <a href="#overview" class="nav-link block px-4 py-2 rounded-lg text-sm">概览</a>
+                    <a href="#day1" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 1-2: BasePage</a>
+                    <a href="#day3" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 3-4: 元素定位</a>
+                    <a href="#day5" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 5-6: 断言验证</a>
+                    <a href="#day7" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 7: Allure报告</a>
+                    <a href="#homework" class="nav-link block px-4 py-2 rounded-lg text-sm">作业清单</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 p-8">
+            <!-- 概览 -->
+            <section id="overview" class="mb-12">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl p-8 text-white">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-3xl font-bold">1</div>
+                        <div>
+                            <h1 class="text-3xl font-bold">Week 1: 基础巩固</h1>
+                            <p class="text-indigo-100">掌握传统测试的核心技能</p>
+                        </div>
+                    </div>
+                    <p class="text-lg opacity-90">本周目标：熟练掌握传统自动化测试的基本操作，能够独立编写 5-10 个测试用例</p>
+                </div>
+
+                <!-- 学习路线图 -->
+                <div class="mt-8 grid md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">1-2</div>
+                        <h3 class="font-bold text-gray-800">BasePage 核心方法</h3>
+                        <p class="text-sm text-gray-600 mt-2">掌握页面导航和基础操作</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">3-4</div>
+                        <h3 class="font-bold text-gray-800">元素定位策略</h3>
+                        <p class="text-sm text-gray-600 mt-2">CSS选择器和XPath</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">5-6</div>
+                        <h3 class="font-bold text-gray-800">断言与验证</h3>
+                        <p class="text-sm text-gray-600 mt-2">掌握各种断言技巧</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">7</div>
+                        <h3 class="font-bold text-gray-800">Allure 报告</h3>
+                        <p class="text-sm text-gray-600 mt-2">生成专业测试报告</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 1-2 -->
+            <section id="day1" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">1-2</div>
+                        <h2 class="text-2xl font-bold text-gray-800">掌握 BasePage 核心方法</h2>
+                    </div>
+
+                    <div class="prose max-w-none text-gray-600 mb-6">
+                        <p class="text-lg">BasePage 是我们框架的基础类，封装了所有常用的页面操作方法。就像学习开车要先熟悉方向盘和油门一样，掌握这些方法非常重要。</p>
+                    </div>
+
+                    <!-- 代码示例 -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-code text-indigo-600"></i> 基础操作示例
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from pages.base_page import BasePage
+
+class TestBasicOperations:
+    """基础操作练习"""
+
+    def test_navigate_and_interact(self, page):
+        base = BasePage(page)
+
+        # 1. 导航到页面
+        base.navigate_to("https://www.example.com")
+
+        # 2. 等待页面加载
+        base.wait_for_page_load()
+
+        # 3. 点击元素
+        base.click("#submit-button")
+
+        # 4. 填写表单
+        base.fill("#username", "testuser")
+        base.fill("#password", "testpass123")
+
+        # 5. 截图记录
+        base.take_screenshot("after_login")</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- 方法速查表 -->
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-list text-indigo-600"></i> 常用方法速查表
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-indigo-100">
+                                    <tr>
+                                        <th class="px-4 py-2 text-left rounded-tl-lg">方法</th>
+                                        <th class="px-4 py-2 text-left">用途</th>
+                                        <th class="px-4 py-2 text-left rounded-tr-lg">示例</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="hover:bg-gray-100"><td class="px-4 py-2 font-mono text-indigo-600">navigate_to(url)</td><td class="px-4 py-2">打开网页</td><td class="px-4 py-2 font-mono text-sm">base.navigate_to("https://baidu.com")</td></tr>
+                                    <tr class="hover:bg-gray-100"><td class="px-4 py-2 font-mono text-indigo-600">click(selector)</td><td class="px-4 py-2">点击元素</td><td class="px-4 py-2 font-mono text-sm">base.click("#btn")</td></tr>
+                                    <tr class="hover:bg-gray-100"><td class="px-4 py-2 font-mono text-indigo-600">fill(selector, value)</td><td class="px-4 py-2">填写输入框</td><td class="px-4 py-2 font-mono text-sm">base.fill("#name", "张三")</td></tr>
+                                    <tr class="hover:bg-gray-100"><td class="px-4 py-2 font-mono text-indigo-600">get_text(selector)</td><td class="px-4 py-2">获取文本</td><td class="px-4 py-2 font-mono text-sm">text = base.get_text(".title")</td></tr>
+                                    <tr class="hover:bg-gray-100"><td class="px-4 py-2 font-mono text-indigo-600">is_visible(selector)</td><td class="px-4 py-2">检查可见性</td><td class="px-4 py-2 font-mono text-sm">if base.is_visible("#modal"):</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 练习任务 -->
+                    <div class="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                        <h3 class="font-bold text-green-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-dumbbell"></i> 练习任务
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <div class="font-bold text-gray-800 mb-2">练习 1: 京东搜索</div>
+                                <p class="text-sm text-gray-600">访问京东首页，搜索"手机"，验证搜索结果页标题包含"手机"</p>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow-sm">
+                                <div class="font-bold text-gray-800 mb-2">练习 2: 淘宝首页元素检查</div>
+                                <p class="text-sm text-gray-600">访问淘宝，检查首页是否有搜索框和登录按钮</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 3-4 -->
+            <section id="day3" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">3-4</div>
+                        <h2 class="text-2xl font-bold text-gray-800">元素定位策略与实践</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-blue-50 rounded-xl p-6">
+                            <h3 class="font-bold text-blue-800 mb-3">CSS 选择器</h3>
+                            <div class="space-y-2 text-sm font-mono">
+                                <div class="bg-white p-2 rounded">#id → #username</div>
+                                <div class="bg-white p-2 rounded">.class → .btn-primary</div>
+                                <div class="bg-white p-2 rounded">[attr] → [type="submit"]</div>
+                                <div class="bg-white p-2 rounded">A B → .form input</div>
+                                <div class="bg-white p-2 rounded">A > B → .nav > li</div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-6">
+                            <h3 class="font-bold text-purple-800 mb-3">XPath vs CSS</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between bg-white p-2 rounded">
+                                    <span>按文本</span>
+                                    <span class="text-green-600">XPath ✓</span>
+                                </div>
+                                <div class="flex justify-between bg-white p-2 rounded">
+                                    <span>按ID</span>
+                                    <span class="text-blue-600">CSS ✓</span>
+                                </div>
+                                <div class="flex justify-between bg-white p-2 rounded">
+                                    <span>父元素</span>
+                                    <span class="text-green-600">XPath ✓</span>
+                                </div>
+                                <div class="flex justify-between bg-white p-2 rounded">
+                                    <span>第N个</span>
+                                    <span class="text-blue-600">CSS ✓</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 5-6 -->
+            <section id="day5" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">5-6</div>
+                        <h2 class="text-2xl font-bold text-gray-800">断言与验证技巧</h2>
+                    </div>
+
+                    <div class="bg-amber-50 rounded-xl p-6 mb-6">
+                        <h3 class="font-bold text-amber-800 mb-3">常用断言方法</h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">from playwright.sync_api import expect
+
+# 验证元素可见
+expect(page.locator(".success")).to_be_visible()
+
+# 验证文本内容
+expect(page.locator(".message")).to_have_text("操作成功")
+
+# 验证包含文本
+expect(page.locator("body")).to_contain_text("欢迎")
+
+# 验证URL
+expect(page).to_have_url("https://example.com/dashboard")
+
+# 验证标题
+expect(page).to_have_title("首页")</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 7 -->
+            <section id="day7" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">7</div>
+                        <h2 class="text-2xl font-bold text-gray-800">Allure 报告与综合练习</h2>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                            <i class="fas fa-chart-line text-3xl text-indigo-600 mb-2"></i>
+                            <div class="font-bold text-gray-800">测试总览</div>
+                            <div class="text-sm text-gray-600">跑了多少，通过多少</div>
+                        </div>
+                        <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                            <i class="fas fa-image text-3xl text-indigo-600 mb-2"></i>
+                            <div class="font-bold text-gray-800">截图附件</div>
+                            <div class="text-sm text-gray-600">你拍的"照片"</div>
+                        </div>
+                        <div class="bg-indigo-50 rounded-lg p-4 text-center">
+                            <i class="fas fa-clock text-3xl text-indigo-600 mb-2"></i>
+                            <div class="font-bold text-gray-800">执行时间</div>
+                            <div class="text-sm text-gray-600">花了多长时间</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 作业清单 -->
+            <section id="homework" class="mb-12">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-lg p-8 text-white">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fas fa-clipboard-check"></i> Week 1 作业清单
+                    </h2>
+                    <p class="mb-4 opacity-90">完成以下任务才算 Week1 毕业：</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>独立完成练习 1-5</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>编写 3 个自己的测试用例</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>生成 Allure 报告并查看</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>理解 BasePage 的 80% 方法</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition md:col-span-2">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>掌握至少 5 种元素定位方式</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 下一步 -->
+            <div class="text-center">
+                <a href="../week2-advanced/index.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:shadow-lg transition">
+                    进入 Week 2: 进阶提升 <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        hljs.highlightAll();
+
+        // 导航高亮
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

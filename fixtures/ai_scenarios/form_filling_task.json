@@ -1,0 +1,92 @@
+{
+  "name": "智能表单填写",
+  "description": "使用 AI 自动识别和填写复杂表单",
+  "forms": [
+    {
+      "form_name": "用户注册",
+      "url": "https://example.com/register",
+      "fields": {
+        "username": {
+          "type": "text",
+          "value": "auto_test_user",
+          "constraints": ["unique", "min_length: 3"]
+        },
+        "email": {
+          "type": "email",
+          "value": "autotest@example.com",
+          "constraints": ["valid_email", "unique"]
+        },
+        "password": {
+          "type": "password",
+          "value": "AutoTest123!",
+          "constraints": ["min_length: 8", "contains_uppercase", "contains_number"]
+        },
+        "confirm_password": {
+          "type": "password",
+          "value": "AutoTest123!",
+          "constraints": ["match:password"]
+        },
+        "phone": {
+          "type": "tel",
+          "value": "13800138000",
+          "constraints": ["valid_phone"]
+        },
+        "birthdate": {
+          "type": "date",
+          "value": "1990-01-01",
+          "constraints": ["age_over: 18"]
+        },
+        "country": {
+          "type": "select",
+          "value": "中国",
+          "constraints": []
+        },
+        "terms_agreement": {
+          "type": "checkbox",
+          "value": true,
+          "constraints": ["required"]
+        },
+        "newsletter": {
+          "type": "checkbox",
+          "value": false,
+          "constraints": []
+        }
+      },
+      "submit_button": "button[type='submit']",
+      "success_indicator": ".registration-success"
+    },
+    {
+      "form_name": "联系表单",
+      "url": "https://example.com/contact",
+      "fields": {
+        "name": {
+          "type": "text",
+          "value": "测试用户",
+          "constraints": ["required"]
+        },
+        "email": {
+          "type": "email",
+          "value": "test@example.com",
+          "constraints": ["required", "valid_email"]
+        },
+        "subject": {
+          "type": "select",
+          "value": "一般咨询",
+          "constraints": ["required"]
+        },
+        "message": {
+          "type": "textarea",
+          "value": "这是一条自动测试消息。请忽略。",
+          "constraints": ["required", "min_length: 10"]
+        }
+      },
+      "submit_button": "button[type='submit']",
+      "success_indicator": ".message-sent-success"
+    }
+  ],
+  "recovery_strategies": {
+    "field_not_found": "try_alternative_selectors",
+    "validation_error": "adjust_value_based_on_error",
+    "form_changed": "re_analyze_form_structure"
+  }
+}

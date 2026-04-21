@@ -1,0 +1,23 @@
+# 开发依赖
+-r requirements.txt
+
+# 代码质量
+black>=24.0.0
+flake8>=7.0.0
+isort>=5.13.0
+mypy>=1.8.0
+pre-commit>=3.6.0
+
+# 测试增强
+pytest-cov>=4.1.0
+pytest-html>=4.1.0
+pytest-repeat>=0.9.3
+pytest-random-order>=1.1.1
+
+# 调试
+ipdb>=0.13.13
+ipython>=8.20.0
+
+# 文档
+mkdocs>=1.5.3
+mkdocs-material>=9.5.3

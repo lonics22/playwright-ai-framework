@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 4: 实战项目 - Playwright AI 框架</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dockerfile.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .step-card { transition: all 0.3s ease; }
+        .step-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .day-badge { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .code-block { background: #282c34; border-radius: 8px; overflow: hidden; }
+        .nav-link { transition: all 0.2s; }
+        .nav-link:hover { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+        .nav-link.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .project-box { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .cicd-box { background: linear-gradient(135deg, #24292e 0%, #586069 100%); }
+        .optimize-box { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 顶部导航 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="../../index.html" class="text-gray-700 hover:text-indigo-600 mr-4">
+                        <i class="fas fa-arrow-left"></i> 返回首页
+                    </a>
+                    <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                        Week 4: 实战项目
+                    </span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="../week3-ai/index.html" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-arrow-left"></i> Week 3
+                    </a>
+                    <span class="text-gray-400">|</span>
+                    <span class="text-green-600 font-medium"><i class="fas fa-graduation-cap"></i> 毕业周</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex max-w-7xl mx-auto">
+        <!-- 侧边导航 -->
+        <aside class="w-64 bg-white shadow-md min-h-screen sticky top-16 hidden md:block">
+            <div class="p-4">
+                <h3 class="font-bold text-gray-700 mb-4">本周内容</h3>
+                <nav class="space-y-2">
+                    <a href="#overview" class="nav-link block px-4 py-2 rounded-lg text-sm">概览</a>
+                    <a href="#day1" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 1-2: 项目架构</a>
+                    <a href="#day3" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 3-4: 功能实现</a>
+                    <a href="#day5" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 5-6: CI/CD 集成</a>
+                    <a href="#day7" class="nav-link block px-4 py-2 rounded-lg text-sm">Day 7: 项目总结</a>
+                    <a href="#graduation" class="nav-link block px-4 py-2 rounded-lg text-sm">毕业要求</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 p-8">
+            <!-- 概览 -->
+            <section id="overview" class="mb-12">
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl shadow-xl p-8 text-white">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-3xl font-bold">4</div>
+                        <div>
+                            <h1 class="text-3xl font-bold">Week 4: 实战项目</h1>
+                            <p class="text-indigo-100">完整自动化测试解决方案</p>
+                        </div>
+                    </div>
+                    <p class="text-lg opacity-90">本周目标：完成一个完整的实战项目，将所学知识应用到真实场景中，搭建企业级测试框架</p>
+                </div>
+
+                <!-- 学习路线图 -->
+                <div class="mt-8 grid md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">1-2</div>
+                        <h3 class="font-bold text-gray-800">项目架构设计</h3>
+                        <p class="text-sm text-gray-600 mt-2">项目选型与架构</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">3-4</div>
+                        <h3 class="font-bold text-gray-800">核心功能实现</h3>
+                        <p class="text-sm text-gray-600 mt-2">页面对象与测试</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">5-6</div>
+                        <h3 class="font-bold text-gray-800">CI/CD 集成</h3>
+                        <p class="text-sm text-gray-600 mt-2">自动化流水线</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 shadow-md">
+                        <div class="day-badge w-12 h-12 rounded-full flex items-center justify-center text-white font-bold mb-3">7</div>
+                        <h3 class="font-bold text-gray-800">项目总结</h3>
+                        <p class="text-sm text-gray-600 mt-2">优化与交付</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 1-2: 项目架构 -->
+            <section id="day1" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="project-box w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">1-2</div>
+                        <h2 class="text-2xl font-bold text-gray-800">项目选型与架构设计</h2>
+                    </div>
+
+                    <div class="prose max-w-none text-gray-600 mb-6">
+                        <p class="text-lg">今天我们要选择一个真实的项目，设计企业级测试框架架构。</p>
+                    </div>
+
+                    <!-- 项目选项 -->
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="fas fa-shopping-cart text-green-600 text-xl"></i>
+                                <h3 class="font-bold text-green-800">电商网站</h3>
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <p>✓ 功能丰富：登录、搜索、购物车、订单</p>
+                                <p>✓ 页面结构清晰</p>
+                                <p>✓ 易于理解业务流程</p>
+                            </div>
+                            <div class="mt-3 text-xs bg-green-100 text-green-800 px-2 py-1 rounded inline-block">推荐新手</div>
+                        </div>
+                        <div class="bg-blue-50 rounded-xl p-6 border border-blue-200">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="fas fa-building text-blue-600 text-xl"></i>
+                                <h3 class="font-bold text-blue-800">企业后台</h3>
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <p>✓ 复杂的表单操作</p>
+                                <p>✓ 数据表格验证</p>
+                                <p>✓ 权限控制测试</p>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-6 border border-purple-200">
+                            <div class="flex items-center gap-2 mb-3">
+                                <i class="fas fa-comments text-purple-600 text-xl"></i>
+                                <h3 class="font-bold text-purple-800">社交应用</h3>
+                            </div>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <p>✓ 实时交互测试</p>
+                                <p>✓ 多媒体内容验证</p>
+                                <p>✓ 复杂用户流程</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 项目结构 -->
+                    <div class="bg-gray-900 rounded-xl p-6 mb-6">
+                        <h3 class="font-bold text-white mb-3 flex items-center gap-2">
+                            <i class="fas fa-folder-tree text-green-400"></i> 项目架构
+                        </h3>
+                        <pre class="text-green-400 text-sm overflow-x-auto"><code>my-test-project/
+├── config/                    # 配置管理
+│   ├── settings.py
+│   └── test_env.yaml
+├── pages/                     # 页面对象
+│   ├── base_page.py
+│   ├── login_page.py
+│   └── components/
+├── tests/                     # 测试用例
+│   ├── conftest.py
+│   └── test_e2e.py
+├── utils/                     # 工具函数
+├── fixtures/                  # 测试数据
+├── reports/                   # 测试报告
+├── scripts/                   # 辅助脚本
+├── .github/workflows/         # CI配置
+├── pytest.ini
+├── requirements.txt
+└── README.md</code></pre>
+                    </div>
+
+                    <!-- 环境配置 -->
+                    <div class="bg-blue-50 rounded-xl p-6">
+                        <h3 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-cog"></i> 环境配置文件
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-yaml"># config/test_env.yaml
+dev:
+  base_url: "https://dev.example-shop.com"
+  api_url: "https://api-dev.example-shop.com"
+  timeout: 30000
+
+staging:
+  base_url: "https://staging.example-shop.com"
+  api_url: "https://api-staging.example-shop.com"
+  timeout: 20000
+
+production:
+  base_url: "https://example-shop.com"
+  timeout: 10000</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 3-4: 核心功能 -->
+            <section id="day3" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="day-badge w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">3-4</div>
+                        <h2 class="text-2xl font-bold text-gray-800">核心功能实现</h2>
+                    </div>
+
+                    <div class="prose max-w-none text-gray-600 mb-6">
+                        <p class="text-lg">实现核心页面对象和完整的端到端测试用例。</p>
+                    </div>
+
+                    <!-- ProductPage 示例 -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-box text-indigo-600"></i> 商品详情页 (ProductPage)
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">class ProductPage(BasePage):
+    """商品详情页"""
+
+    # 选择器定义
+    PRODUCT_NAME = "h1.product-name"
+    PRODUCT_PRICE = ".product-price .current-price"
+    ADD_TO_CART_BTN = "#add-to-cart"
+    QUANTITY_INPUT = "#quantity"
+    SIZE_OPTIONS = ".size-option"
+    COLOR_OPTIONS = ".color-option"
+    STOCK_STATUS = ".stock-status"
+
+    def get_product_name(self) -> str:
+        """获取商品名称"""
+        return self.get_text(self.PRODUCT_NAME)
+
+    def get_product_price(self) -> float:
+        """获取商品价格"""
+        price_text = self.get_text(self.PRODUCT_PRICE)
+        return float(price_text.replace('¥', '').replace(',', ''))
+
+    def select_size(self, size: str):
+        """选择尺码"""
+        size_selector = f"{self.SIZE_OPTIONS}[data-size='{size}']"
+        self.click(size_selector)
+        return self
+
+    def add_to_cart(self):
+        """加入购物车"""
+        self.click(self.ADD_TO_CART_BTN)
+        self.wait_for_element_visible(".toast-success", timeout=5000)
+        return self</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- 端到端测试 -->
+                    <div class="bg-indigo-50 rounded-xl p-6">
+                        <h3 class="font-bold text-indigo-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-route"></i> 完整端到端测试
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-python">@allure.epic("端到端测试")
+@allure.feature("完整购物流程")
+class TestE2EShopping:
+    """端到端购物测试"""
+
+    @pytest.fixture
+    def logged_in_user(self, page, env_config):
+        """登录用户 fixture"""
+        login = LoginPage(page)
+        login.navigate()
+        login.login("test@example.com", "TestPass123!")
+        yield page
+
+    @allure.title("完整购物到支付流程")
+    def test_complete_purchase_flow(self, logged_in_user):
+        """测试完整购物流程"""
+        page = logged_in_user
+
+        with allure.step("1. 浏览首页"):
+            home = HomePage(page)
+            home.navigate()
+            home.wait_for_page_load()
+
+        with allure.step("2. 选择商品"):
+            product = home.click_recommended_product(index=0)
+            product_name = product.get_product_name()
+            product_price = product.get_product_price()
+
+        with allure.step("3. 添加到购物车"):
+            product.add_to_cart()
+
+        with allure.step("4. 结算"):
+            cart = CartPage(page)
+            cart.navigate()
+            checkout = cart.proceed_to_checkout()
+
+        with allure.step("5. 填写收货信息"):
+            checkout.fill_shipping_info(
+                name="张三",
+                phone="13800138000",
+                address="北京市朝阳区xxx街道",
+                city="北京",
+                postcode="100000"
+            )
+
+        with allure.step("6. 提交订单"):
+            order = checkout.place_order()
+            assert order.is_order_successful()</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 5-6: CI/CD -->
+            <section id="day5" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="cicd-box w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">5-6</div>
+                        <h2 class="text-2xl font-bold text-gray-800">CI/CD 集成与自动化</h2>
+                    </div>
+
+                    <div class="prose max-w-none text-gray-600 mb-6">
+                        <p class="text-lg">配置 GitHub Actions 和 Jenkins 实现自动化测试流水线。</p>
+                    </div>
+
+                    <!-- GitHub Actions -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fab fa-github text-gray-800"></i> GitHub Actions 配置
+                        </h3>
+                        <div class="code-block">
+                            <pre><code class="language-yaml"># .github/workflows/test.yml
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # 每天晚上 2 点运行
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        playwright install chromium
+
+    - name: Run smoke tests
+      run: |
+        pytest tests/ -m smoke -v --alluredir=reports/allure-results
+      env:
+        TEST_ENV: staging
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+    - name: Run regression tests
+      if: github.ref == 'refs/heads/main'
+      run: |
+        pytest tests/ -m regression -v --alluredir=reports/allure-results
+
+    - name: Generate Allure Report
+      uses: simple-elf/allure-report-action@master
+      with:
+        allure_results: reports/allure-results
+        allure_history: allure-history</code></pre>
+                        </div>
+                    </div>
+
+                    <!-- Docker 支持 -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-blue-50 rounded-xl p-6">
+                            <h3 class="font-bold text-blue-800 mb-3 flex items-center gap-2">
+                                <i class="fab fa-docker"></i> Dockerfile
+                            </h3>
+                            <div class="code-block">
+                                <pre><code class="language-dockerfile">FROM mcr.microsoft.com/playwright/python:v1.40.0-jammy
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD ["pytest", "tests/", "-v"]</code></pre>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 rounded-xl p-6">
+                            <h3 class="font-bold text-green-800 mb-3 flex items-center gap-2">
+                                <i class="fas fa-file-code"></i> docker-compose.yml
+                            </h3>
+                            <div class="code-block">
+                                <pre><code class="language-yaml">version: '3'
+services:
+  tests:
+    build: .
+    environment:
+      - TEST_ENV=staging
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./reports:/app/reports
+    command: pytest tests/ -v --alluredir=reports/allure-results</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Day 7: 项目总结 -->
+            <section id="day7" class="mb-12">
+                <div class="bg-white rounded-2xl shadow-lg p-8 step-card">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="optimize-box w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-bold">7</div>
+                        <h2 class="text-2xl font-bold text-gray-800">项目总结与优化</h2>
+                    </div>
+
+                    <!-- 性能优化 -->
+                    <div class="mb-6">
+                        <h3 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-rocket text-pink-600"></i> 性能优化建议
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-bold text-gray-700 mb-2">1. 并行执行测试</div>
+                                <div class="code-block">
+                                    <pre><code class="language-ini"># pytest.ini
+[pytest]
+addopts = -n auto --dist=loadgroup</code></pre>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-bold text-gray-700 mb-2">2. 失败重试</div>
+                                <div class="code-block">
+                                    <pre><code class="language-ini"># pytest.ini
+addopts = --reruns 2 --reruns-delay 1</code></pre>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-bold text-gray-700 mb-2">3. 选择性执行</div>
+                                <div class="code-block">
+                                    <pre><code class="language-bash"># 只运行修改文件相关的测试
+pytest --testmon</code></pre>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="font-bold text-gray-700 mb-2">4. 截图优化</div>
+                                <div class="code-block">
+                                    <pre><code class="language-python"># 只在失败时截图
+def pytest_runtest_makereport(item, call):
+    if call.when == "call" and call.excinfo is not None:
+        # 失败时才截图
+        pass</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 项目检查清单 -->
+                    <div class="bg-amber-50 rounded-xl p-6">
+                        <h3 class="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-clipboard-check"></i> 项目检查清单
+                        </h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-2">代码质量</h4>
+                                <ul class="space-y-1 text-gray-600">
+                                    <li>□ 所有页面对象有完整文档字符串</li>
+                                    <li>□ 测试用例有清晰的 AAA 结构</li>
+                                    <li>□ 使用了类型注解</li>
+                                    <li>□ 代码通过 flake8 检查</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-2">测试覆盖</h4>
+                                <ul class="space-y-1 text-gray-600">
+                                    <li>□ 核心业务流程有 E2E 测试</li>
+                                    <li>□ 至少 80% 页面有自动化测试</li>
+                                    <li>□ 包含正例和反例测试</li>
+                                    <li>□ 有性能基准测试</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-700 mb-2">报告与监控</h4>
+                                <ul class="space-y-1 text-gray-600">
+                                    <li>□ Allure 报告能正常生成</li>
+                                    <li>□ 测试失败自动截图</li>
+                                    <li>□ CI/CD 集成完成</li>
+                                    <li>□ 有测试成功率监控</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 毕业要求 -->
+            <section id="graduation" class="mb-12">
+                <div class="bg-gradient-to-r from-green-500 to-teal-600 rounded-2xl shadow-lg p-8 text-white">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                        <i class="fas fa-graduation-cap"></i> Week 4 毕业项目要求
+                    </h2>
+                    <p class="mb-4 opacity-90">完成以下项目才能毕业：</p>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>选择一个真实网站，完成用户认证、核心业务、至少 3 个端到端流程测试</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>至少 5 个页面对象类，至少 2 个可复用组件，使用 SmartLocator</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>至少 20 个测试用例，包含传统测试和 AI 测试，有 smoke、regression 标记</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>GitHub Actions 或 Jenkins 配置，自动触发测试，报告自动归档</span>
+                        </label>
+                        <label class="flex items-center gap-3 bg-white bg-opacity-20 p-4 rounded-lg cursor-pointer hover:bg-opacity-30 transition md:col-span-2">
+                            <input type="checkbox" class="w-5 h-5 rounded">
+                            <span>README 文档、测试计划文档、项目演示视频（可选）</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 课程总结 -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i class="fas fa-trophy text-yellow-500"></i> 4周学习路径回顾
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600">1</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 1: 基础巩固</h4>
+                            <p class="text-sm text-gray-600">BasePage 核心方法 → 元素定位策略 → 断言与验证 → Allure 报告</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600">2</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 2: 进阶提升</h4>
+                            <p class="text-sm text-gray-600">页面对象模式 (POM) → SmartLocator 智能定位 → Self-Healing 自我修复 → 完整测试框架</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-600">3</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 3: AI 能力</h4>
+                            <p class="text-sm text-gray-600">AI 环境配置 → 自然语言测试 → 混合模式实践 → AI 测试最佳实践</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-600">4</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 4: 实战项目</h4>
+                            <p class="text-sm text-gray-600">项目架构设计 → 核心功能实现 → CI/CD 集成 → 企业级测试方案</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl">
+                    <h4 class="font-bold text-gray-800 mb-3">你现在已经掌握了：</h4>
+                    <div class="grid md:grid-cols-3 gap-3 text-sm">
+                        <div class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> 传统自动化测试技能</div>
+                        <div class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> 页面对象模式设计</div>
+                        <div class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> 智能元素定位与自愈</div>
+                        <div class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> AI 驱动测试能力</div>
+                        <div class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> 企业级测试框架搭建</div>
+                        <div class="flex items-center gap-2"><i class="fas fa-check text-green-500"></i> CI/CD 持续集成</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 恭喜毕业 -->
+            <div class="text-center bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-8 text-white">
+                <div class="text-5xl mb-4">🎉</div>
+                <h2 class="text-3xl font-bold mb-4">恭喜你完成全部课程！</h2>
+                <p class="text-lg opacity-90 mb-6">你已经从一个自动化测试小白成长为具备企业级测试能力的工程师。</p>
+                <div class="flex justify-center gap-4">
+                    <a href="../week1-basics/index.html" class="bg-white text-orange-500 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                        <i class="fas fa-redo"></i> 复习 Week 1
+                    </a>
+                    <a href="../../framework-design.md" class="bg-white text-orange-500 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                        <i class="fas fa-book"></i> 查看设计文档
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        hljs.highlightAll();
+
+        // 导航高亮
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

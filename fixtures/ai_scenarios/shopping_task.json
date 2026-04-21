@@ -1,0 +1,53 @@
+{
+  "name": "完整购物流程",
+  "description": "从浏览商品到完成支付的完整购物流程测试",
+  "steps": [
+    {
+      "action": "navigate",
+      "target": "https://example-shop.com",
+      "description": "访问电商网站首页"
+    },
+    {
+      "action": "search",
+      "keyword": "wireless headphones",
+      "description": "搜索无线耳机"
+    },
+    {
+      "action": "select_and_add",
+      "criteria": "first item",
+      "description": "选择第一个商品并添加到购物车"
+    },
+    {
+      "action": "verify_cart",
+      "description": "验证购物车中商品正确"
+    },
+    {
+      "action": "proceed_to_checkout",
+      "description": "进入结算流程"
+    },
+    {
+      "action": "fill_shipping",
+      "address_key": "shipping.0",
+      "description": "填写配送地址"
+    },
+    {
+      "action": "select_payment",
+      "method": "credit_card",
+      "description": "选择支付方式"
+    },
+    {
+      "action": "complete_payment",
+      "description": "完成支付"
+    },
+    {
+      "action": "verify_confirmation",
+      "expected": "order confirmation page with success message",
+      "description": "验证订单确认页面"
+    }
+  ],
+  "expected_results": {
+    "success": true,
+    "order_created": true,
+    "confirmation_message": "contains '订单成功' or 'order confirmed'"
+  }
+}

@@ -1,0 +1,106 @@
+# 测试数据文件
+
+users:
+  standard_user:
+    username: "testuser"
+    email: "testuser@example.com"
+    password: "TestPass123!"
+    first_name: "Test"
+    last_name: "User"
+    phone: "13800138000"
+
+  admin_user:
+    username: "admin"
+    email: "admin@example.com"
+    password: "AdminPass123!"
+    role: "admin"
+
+  invalid_user:
+    username: "invaliduser"
+    email: "invalid@example.com"
+    password: "WrongPass123!"
+
+products:
+  electronics:
+    - name: "无线耳机"
+      price: 299.99
+      category: "electronics"
+      sku: "ELEC-001"
+
+    - name: "蓝牙音箱"
+      price: 199.99
+      category: "electronics"
+      sku: "ELEC-002"
+
+    - name: "智能手表"
+      price: 1299.99
+      category: "electronics"
+      sku: "ELEC-003"
+
+  clothing:
+    - name: "T恤"
+      price: 99.99
+      category: "clothing"
+      size: ["S", "M", "L", "XL"]
+
+    - name: "牛仔裤"
+      price: 299.99
+      category: "clothing"
+      size: ["28", "30", "32", "34"]
+
+addresses:
+  shipping:
+    - name: "张三"
+      phone: "13800138000"
+      street: "建国路88号"
+      city: "北京"
+      province: "北京市"
+      postcode: "100000"
+      country: "中国"
+
+    - name: "李四"
+      phone: "13900139000"
+      street: "南京东路100号"
+      city: "上海"
+      province: "上海市"
+      postcode: "200000"
+      country: "中国"
+
+payment_methods:
+  credit_card:
+    type: "credit_card"
+    number: "4111111111111111"
+    holder: "Test User"
+    expiry: "12/25"
+    cvv: "123"
+
+  paypal:
+    type: "paypal"
+    email: "test@paypal.com"
+
+test_scenarios:
+  login:
+    valid_credentials:
+      - username: "testuser@example.com"
+        password: "TestPass123!"
+        expected_result: "success"
+
+    invalid_credentials:
+      - username: "testuser@example.com"
+        password: "WrongPassword"
+        expected_result: "error"
+        error_message: "密码错误"
+
+      - username: "nonexistent@example.com"
+        password: "AnyPassword"
+        expected_result: "error"
+        error_message: "用户不存在"
+
+  checkout:
+    valid_checkout:
+      products:
+        - sku: "ELEC-001"
+          quantity: 1
+      shipping_address: "shipping.0"
+      payment_method: "credit_card"
+      expected_result: "order_confirmed"

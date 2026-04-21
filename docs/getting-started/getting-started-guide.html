@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Playwright AI 框架 - 新手入门完全指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .step-card {
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .code-block {
+            background: #282c34;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .file-tree {
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .tree-line {
+            margin-left: 20px;
+            border-left: 2px solid #444;
+            padding-left: 10px;
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-dot:hover, .nav-dot.active {
+            background: white;
+            transform: scale(1.3);
+        }
+
+        .diagram-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .arrow-down {
+            text-align: center;
+            color: #667eea;
+            font-size: 30px;
+            margin: 10px 0;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .command-card {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4a5568;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn:hover {
+            background: #667eea;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- 导航点 -->
+    <div class="nav-dots">
+        <div class="nav-dot active" onclick="scrollToSection('step1')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step2')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step3')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step4')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step5')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step6')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step7')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step8')"></div>
+        <div class="nav-dot" onclick="scrollToSection('step9')"></div>
+    </div>
+
+    <!-- 头部 -->
+    <header class="text-white py-16 px-4">
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="floating mb-6">
+                <i class="fas fa-rocket text-6xl"></i>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4">Playwright AI 框架</h1>
+            <p class="text-xl md:text-2xl opacity-90">新手入门完全指南</p>
+            <p class="text-lg mt-4 opacity-75">从零开始，手把手教你搭建并运行第一个自动化测试</p>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 pb-20">
+
+        <!-- 准备工作 -->
+        <section id="step1" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">准备工作</h2>
+                        <p class="text-gray-600 mb-6 text-lg">就像准备做饭前要洗好菜，写代码也需要一些基础工具</p>
+
+                        <div class="diagram-box">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">📦 必备清单</h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                                    <div>
+                                        <div class="font-bold">Python 3.11+</div>
+                                        <div class="text-sm text-gray-600">我们的"主厨"，必须安装</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                                    <div>
+                                        <div class="font-bold">Git</div>
+                                        <div class="text-sm text-gray-600">用来下载代码的"运输工具"</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                                    <div>
+                                        <div class="font-bold">VS Code 或 PyCharm</div>
+                                        <div class="text-sm text-gray-600">代码编辑器（推荐 VS Code）</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
+                                    <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                                    <div>
+                                        <div class="font-bold">稳定的网络</div>
+                                        <div class="text-sm text-gray-600">下载东西要用</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">🔍 检查 Python 是否安装</h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <div class="font-bold mb-2 text-blue-600">Windows 用户：</div>
+                                    <ol class="list-decimal list-inside space-y-2 text-sm">
+                                        <li>按下 <kbd class="bg-gray-200 px-2 py-1 rounded">Win + R</kbd> 键</li>
+                                        <li>输入 <kbd class="bg-gray-200 px-2 py-1 rounded">cmd</kbd> 回车</li>
+                                        <li>输入以下命令：</li>
+                                    </ol>
+                                    <div class="command-card mt-2">
+                                        <code>python --version</code>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-100 p-4 rounded-lg">
+                                    <div class="font-bold mb-2 text-blue-600">Mac 用户：</div>
+                                    <ol class="list-decimal list-inside space-y-2 text-sm">
+                                        <li>打开"终端"（应用程序 → 实用工具）</li>
+                                        <li>输入命令：</li>
+                                    </ol>
+                                    <div class="command-card mt-2">
+                                        <code>python3 --version</code>
+                                        <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="success-box mt-4">
+                                <i class="fas fa-lightbulb mr-2"></i>
+                                <strong>成功标志：</strong>看到类似 <code>Python 3.11.4</code> 的字样就说明安装成功了！
+                            </div>
+
+                            <div class="tip-box mt-4">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                <strong>提示：</strong>如果提示"找不到命令"，先去 <a href="https://www.python.org/downloads/" class="underline" target="_blank">python.org</a> 下载安装 Python
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 下载代码 -->
+        <section id="step2" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">下载框架代码</h2>
+                        <p class="text-gray-600 mb-6 text-lg">把"菜谱"拿回家，这一步就像去书店买食谱</p>
+
+                        <div class="diagram-box">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">📥 使用 Git 下载（推荐）</h3>
+                            <div class="space-y-3">
+                                <div class="command-card">
+                                    <span class="text-gray-500"># 1. 先找个地方放代码（比如桌面）</span>
+                                    <br><code>cd Desktop</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+                                <div class="command-card">
+                                    <span class="text-gray-500"># 2. 下载代码</span>
+                                    <br><code>git clone https://github.com/your-username/playwright-ai-framework.git</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+                                <div class="command-card">
+                                    <span class="text-gray-500"># 3. 进入项目文件夹</span>
+                                    <br><code>cd playwright-ai-framework</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="diagram-box mt-6">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">🗂️ 下载后你的文件夹结构</h3>
+                            <div class="file-tree">
+                                📁 桌面/
+                                └── 📁 playwright-ai-framework/  ← 你在这里
+                                    ├── 📁 config/
+                                    ├── 📁 core/
+                                    ├── 📁 pages/
+                                    ├── 📁 tests/
+                                    ├── 📁 utils/
+                                    ├── 📄 requirements.txt
+                                    ├── 📄 pytest.ini
+                                    └── 📄 README.md
+                            </div>
+                        </div>
+
+                        <div class="tip-box mt-6">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>没有 Git？</strong> 直接去网页下载 ZIP 包，解压到桌面也可以！
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 创建虚拟环境 -->
+        <section id="step3" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">创建虚拟环境</h2>
+                        <p class="text-gray-600 mb-6 text-lg">给项目建个"独立小屋"</p>
+
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex">
+                                <i class="fas fa-question-circle text-yellow-400 text-xl mr-3"></i>
+                                <div>
+                                    <p class="font-bold text-gray-800">为什么要这样做？</p>
+                                    <p class="text-gray-600 mt-1">想象你在做蛋糕，需要特定品牌的面粉。虚拟环境就像给这个蛋糕专门准备的一个储物柜，里面放它需要的所有材料，不会和其他蛋糕的材料混在一起。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="diagram-box">
+                                <h3 class="font-bold text-xl mb-4 text-gray-700">🏗️ 创建虚拟环境</h3>
+                                <div class="command-card">
+                                    <span class="text-gray-500"># Windows</span>
+                                    <br><code>python -m venv .venv</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="command-card mt-2">
+                                    <span class="text-gray-500"># Mac</span>
+                                    <br><code>python3 -m venv .venv</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                            </div>
+
+                            <div class="diagram-box">
+                                <h3 class="font-bold text-xl mb-4 text-gray-700">⚡ 激活虚拟环境</h3>
+                                <div class="command-card">
+                                    <span class="text-gray-500"># Windows</span>
+                                    <br><code>.venv\Scripts\activate</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="command-card mt-2">
+                                    <span class="text-gray-500"># Mac</span>
+                                    <br><code>source .venv/bin/activate</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="success-box mt-6">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <strong>成功标志：</strong>你会看到命令行前面多了 <code>(.venv)</code> 字样
+                            <div class="mt-2 bg-white bg-opacity-20 p-3 rounded">
+                                <span class="text-sm"># 激活前：</span><br>
+                                <code>C:\Users\你的名字\Desktop\playwright-ai-framework&gt;</code><br><br>
+                                <span class="text-sm"># 激活后：</span><br>
+                                <code class="text-yellow-200">(.venv)</code> <code>C:\Users\你的名字\Desktop\playwright-ai-framework&gt;</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 安装依赖 -->
+        <section id="step4" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">安装依赖</h2>
+                        <p class="text-gray-600 mb-6 text-lg">准备食材 - 安装项目需要的各种工具包</p>
+
+                        <div class="diagram-box">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">📦 安装 Python 包</h3>
+                            <div class="command-card mb-4">
+                                <code>pip install -r requirements.txt</code>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p class="font-bold text-blue-800 mb-2">这个过程会安装什么？</p>
+                                <div class="grid md:grid-cols-2 gap-2 text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span>🧪</span> <span>pytest - 测试框架</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span>🎭</span> <span>playwright - 浏览器自动化</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span>📊</span> <span>allure-pytest - 报告工具</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span>🤖</span> <span>browser-use - AI 功能</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span>🔗</span> <span>langchain - AI 连接工具</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span>📄</span> <span>PyYAML - YAML 解析</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tip-box mt-6">
+                            <i class="fas fa-clock mr-2"></i>
+                            <strong>等待时间：</strong>根据网络情况，大概需要 2-5 分钟。看到绿色文字 "Successfully installed" 就是成功了！
+                        </div>
+
+                        <div class="diagram-box mt-6">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">🌐 安装浏览器</h3>
+                            <p class="text-gray-600 mb-3">Playwright 需要特定的浏览器版本：</p>
+                            <div class="command-card">
+                                <code>playwright install chromium</code>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">这就像下载了一个特定版本的 Chrome 浏览器专门给自动化测试用</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 配置环境变量 -->
+        <section id="step5" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">5</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">配置环境变量</h2>
+                        <p class="text-gray-600 mb-6 text-lg">设置"密码本" - 告诉程序一些秘密配置</p>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="diagram-box">
+                                <h3 class="font-bold text-xl mb-4 text-gray-700">📄 复制配置文件</h3>
+                                <div class="command-card">
+                                    <span class="text-gray-500"># Windows</span>
+                                    <br><code>copy .env.example .env</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="command-card mt-2">
+                                    <span class="text-gray-500"># Mac</span>
+                                    <br><code>cp .env.example .env</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                            </div>
+
+                            <div class="diagram-box">
+                                <h3 class="font-bold text-xl mb-4 text-gray-700">🗂️ 文件位置</h3>
+                                <div class="file-tree text-sm">
+📁 playwright-ai-framework
+   ├── 📄 .env ← 修改这个文件
+   └── 📄 .env.example
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="diagram-box mt-6">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">✏️ 编辑 .env 文件</h3>
+                            <p class="text-gray-600 mb-3">用 VS Code 打开项目文件夹，找到 <code>.env</code> 文件，内容改成：</p>
+                            <div class="code-block">
+                                <pre><code class="language-bash"># API Keys for AI Testing（AI测试用的密钥）
+# 如果你只想跑传统测试，可以先不管这些
+OPENAI_API_KEY=sk-你的openai密钥
+ANTHROPIC_API_KEY=sk-ant-你的anthropic密钥
+
+# Test Environment（测试环境）
+TEST_ENV=default
+
+# Browser Configuration（浏览器配置）
+BROWSER=headless</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="success-box mt-6">
+                            <i class="fas fa-lightbulb mr-2"></i>
+                            <strong>新手提示：</strong>如果你没有 OpenAI 密钥，没关系！可以先跑传统测试，不需要填这个。传统测试完全免费！
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 写第一个测试 -->
+        <section id="step6" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">6</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">写第一个测试用例</h2>
+                        <p class="text-gray-600 mb-6 text-lg">做第一道菜！我们来测试打开百度首页</p>
+
+                        <div class="diagram-box">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">📄 创建测试文件</h3>
+                            <p class="text-gray-600 mb-3">在 <code>tests/traditional/</code> 文件夹下新建文件 <code>test_my_first.py</code></p>
+                            <div class="file-tree text-sm mb-4">
+📁 playwright-ai-framework
+   ├── 📁 tests
+   │   ├── 📁 traditional
+   │   │   └── 📄 test_my_first.py ← 新建这个
+   │   └── ...
+                            </div>
+                        </div>
+
+                        <div class="diagram-box mt-6">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">📝 写入测试代码</h3>
+                            <div class="code-block">
+                                <pre><code class="language-python"># tests/traditional/test_my_first.py
+import allure
+from pages.base_page import BasePage
+
+@allure.feature("我的第一个测试")
+class TestMyFirst:
+    """这是注释：新手入门测试"""
+
+    @allure.title("访问百度首页")
+    def test_visit_baidu(self, page):
+        """测试打开百度首页"""
+        # 1. 创建页面对象（拿起锅铲）
+        base_page = BasePage(page)
+
+        # 2. 打开百度（开火炒菜）
+        base_page.navigate_to("https://www.baidu.com")
+
+        # 3. 等待页面加载完成（等待菜熟）
+        base_page.wait_for_page_load()
+
+        # 4. 验证页面标题包含"百度"（尝一口看味道对不对）
+        assert "百度" in base_page.get_page_title()
+
+        # 5. 截图留念（拍照发朋友圈）
+        base_page.take_screenshot("百度首页")</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-lg">
+                            <h4 class="font-bold text-lg mb-3 text-gray-800">🎯 测试代码就像做一道菜的步骤：</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                                    <span>准备工具（import + 创建对象）</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                                    <span>开火下锅（navigate_to 打开网页）</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                                    <span>等待煮熟（wait_for_page_load）</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                                    <span>尝味道（assert 断言验证）</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">5</div>
+                                    <span>拍照记录（take_screenshot）</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 运行测试 -->
+        <section id="step7" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">7</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">运行测试</h2>
+                        <p class="text-gray-600 mb-6 text-lg">开始做菜！见证奇迹的时刻</p>
+
+                        <div class="diagram-box">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">▶️ 运行单个测试</h3>
+                            <div class="command-card mb-4">
+                                <code>pytest tests/traditional/test_my_first.py -v</code>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+
+                            <div class="bg-green-50 border border-green-200 p-4 rounded-lg">
+                                <p class="font-bold text-green-800 mb-2">你会看到类似这样的输出：</p>
+                                <pre class="text-sm text-green-700 overflow-x-auto">================================= test session starts ==================================
+platform win32 -- Python 3.11.4, pytest-8.0.0, pluggy-1.0.0
+rootdir: d:\softfile\playwright-ai-framework-master
+collected 1 item
+
+tests\traditional\test_my_first.py::TestMyFirst::test_visit_baidu PASSED          [100%]
+
+================================== 1 passed in 3.42s ==================================</pre>
+                            </div>
+                        </div>
+
+                        <div class="success-box mt-6">
+                            <i class="fas fa-trophy mr-2"></i>
+                            <strong>看到绿色的 PASSED 就说明成功了！</strong> 🎉
+                        </div>
+
+                        <div class="mt-6 bg-red-50 border-l-4 border-red-400 p-4">
+                            <div class="flex">
+                                <i class="fas fa-times-circle text-red-400 text-xl mr-3"></i>
+                                <div>
+                                    <p class="font-bold text-red-800">如果看到红色 FAILED</p>
+                                    <p class="text-red-600 mt-1">不要慌，看看错误信息。比如：</p>
+                                    <code class="block bg-red-100 p-2 rounded mt-2 text-sm">AssertionError: assert '百度' in 'Google'</code>
+                                    <p class="text-red-600 mt-2">这说明网页标题不对，可能是网络问题或者网页变了。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 查看报告 -->
+        <section id="step8" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">8</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">查看测试报告</h2>
+                        <p class="text-gray-600 mb-6 text-lg">欣赏成品 - 看看你的测试结果长什么样</p>
+
+                        <div class="diagram-box">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">📊 生成 Allure 报告</h3>
+                            <div class="space-y-3">
+                                <div class="command-card">
+                                    <span class="text-gray-500"># 1. 生成报告数据</span>
+                                    <br><code>pytest tests/traditional/test_my_first.py --alluredir=reports/allure-results</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="command-card">
+                                    <span class="text-gray-500"># 2. 生成 HTML 报告</span>
+                                    <br><code>allure generate reports/allure-results -o reports/allure-report --clean</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                                <div class="command-card">
+                                    <span class="text-gray-500"># 3. 打开报告</span>
+                                    <br><code>allure open reports/allure-report</code>
+                                    <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-lg">
+                            <h4 class="font-bold text-lg mb-4 text-gray-800">📋 报告里有什么？</h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-2xl">📈</span>
+                                    <div>
+                                        <div class="font-bold">测试总览</div>
+                                        <div class="text-sm text-gray-600">跑了多少，通过多少</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-2xl">📋</span>
+                                    <div>
+                                        <div class="font-bold">测试用例列表</div>
+                                        <div class="text-sm text-gray-600">每个测试的详细信息</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-2xl">🖼️</span>
+                                    <div>
+                                        <div class="font-bold">截图附件</div>
+                                        <div class="text-sm text-gray-600">你拍的"照片"</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-2xl">⏱️</span>
+                                    <div>
+                                        <div class="font-bold">执行时间</div>
+                                        <div class="text-sm text-gray-600">花了多长时间</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 border-2 border-dashed border-gray-300 p-6 rounded-lg text-center">
+                            <p class="text-gray-500 mb-3">报告示意图</p>
+                            <div class="bg-white shadow-lg rounded-lg p-4 inline-block text-left">
+                                <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-3 font-bold">
+                                    🟢 1 Passed 🔴 0 Failed ⚪ 0 Skipped
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div class="font-bold text-gray-700">📁 我的第一个测试</div>
+                                    <div class="pl-4 flex items-center gap-2">
+                                        <span>📝 访问百度首页</span>
+                                        <span class="text-green-500">✅</span>
+                                    </div>
+                                    <div class="pl-8 text-gray-500 text-xs">
+                                        <div>⏱️ Duration: 3.42s</div>
+                                        <div>🖼️ 百度首页.png</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="arrow-down"><i class="fas fa-arrow-down"></i></div>
+
+        <!-- 尝试AI测试 -->
+        <section id="step9" class="step-section mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8 step-card">
+                <div class="flex items-start gap-6">
+                    <div class="step-number">9</div>
+                    <div class="flex-1">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">尝试 AI 测试（进阶）</h2>
+                        <p class="text-gray-600 mb-6 text-lg">体验 AI 的神奇之处</p>
+
+                        <div class="bg-gradient-to-r from-purple-100 to-pink-100 p-6 rounded-lg mb-6">
+                            <h4 class="font-bold text-lg mb-3">🤖 AI 测试有什么不同？</h4>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <div class="font-bold text-gray-700 mb-2">传统测试：</div>
+                                    <p class="text-sm text-gray-600">你告诉电脑：点击 id='kw' 的元素，输入"Python教程"</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg">
+                                    <div class="font-bold text-purple-700 mb-2">AI 测试：</div>
+                                    <p class="text-sm text-gray-600">你告诉电脑：在搜索框输入"Python教程"<br>电脑自己找搜索框！</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="diagram-box">
+                            <h3 class="font-bold text-xl mb-4 text-gray-700">📝 AI 测试示例代码</h3>
+                            <div class="code-block">
+                                <pre><code class="language-python">import pytest
+import allure
+
+@pytest.mark.ai
+@allure.feature("AI 演示测试")
+class TestAIDemo:
+
+    @allure.title("AI 自动搜索")
+    async def test_ai_search(self, async_ai_agent, async_page):
+        """让 AI 自动完成搜索任务"""
+        # 打开百度
+        await async_page.goto("https://www.baidu.com")
+
+        # 让 AI 执行搜索（你只需要说一句话！）
+        result = await async_ai_agent.execute_task(
+            "在搜索框输入'Python教程'并点击搜索按钮"
+        )
+
+        # 验证成功
+        assert result.success</code></pre>
+                            </div>
+                        </div>
+
+                        <div class="command-card mt-4">
+                            <span class="text-gray-500"># 运行 AI 测试</span>
+                            <br><code>pytest tests/ai_driven/test_ai_demo.py -v -m ai</code>
+                            <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 完成祝贺 -->
+        <section class="mb-12">
+            <div class="bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl shadow-xl p-8 text-white text-center">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-3xl font-bold mb-4">恭喜你！</h2>
+                <p class="text-xl mb-6">如果按照这个指南操作到这里，你已经成功运行了第一个自动化测试！</p>
+                <p class="opacity-90">接下来就可以开始探索更多高级功能了，加油！💪</p>
+            </div>
+        </section>
+
+        <!-- 命令速查表 -->
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">📝 完整命令速查表</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="p-3 border">你想做什么</th>
+                                <th class="p-3 border">输入什么命令</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-3 border">创建虚拟环境</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">python -m venv .venv</code></td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3 border">激活虚拟环境（Win）</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">.venv\Scripts\activate</code></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border">激活虚拟环境（Mac）</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">source .venv/bin/activate</code></td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3 border">安装依赖</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">pip install -r requirements.txt</code></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border">安装浏览器</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">playwright install chromium</code></td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3 border">运行所有测试</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">pytest</code></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border">运行特定测试</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">pytest tests/traditional/test_login.py</code></td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3 border">运行带详细输出</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">pytest -v</code></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border">运行 AI 测试</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">pytest -m ai</code></td>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <td class="p-3 border">生成报告</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded text-xs">allure generate reports/allure-results -o reports/allure-report --clean</code></td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 border">查看报告</td>
+                                <td class="p-3 border"><code class="bg-gray-100 px-2 py-1 rounded">allure open reports/allure-report</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 常见问题 -->
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">🔧 常见问题排查</h2>
+
+                <div class="space-y-4">
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4">
+                        <p class="font-bold text-red-800">Q1: 提示 "pip 不是内部或外部命令"</p>
+                        <p class="text-red-600 mt-1"><strong>原因：</strong>Python 安装时没勾选 "Add to PATH"</p>
+                        <p class="text-red-600"><strong>解决：</strong>重新安装 Python，安装时勾选 "Add Python to PATH"</p>
+                    </div>
+
+                    <div class="bg-orange-50 border-l-4 border-orange-400 p-4">
+                        <p class="font-bold text-orange-800">Q2: 提示 "playwright 不是内部或外部命令"</p>
+                        <p class="text-orange-600 mt-1"><strong>原因：</strong>虚拟环境没激活</p>
+                        <p class="text-orange-600"><strong>解决：</strong>重新激活虚拟环境</p>
+                    </div>
+
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                        <p class="font-bold text-yellow-800">Q3: 浏览器启动失败</p>
+                        <p class="text-yellow-600 mt-1"><strong>原因：</strong>playwright 浏览器没装好</p>
+                        <p class="text-yellow-600"><strong>解决：</strong>运行 <code>playwright install chromium</code></p>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4">
+                        <p class="font-bold text-blue-800">Q4: 测试运行时浏览器一闪而过</p>
+                        <p class="text-blue-600 mt-1"><strong>这是正常的！</strong> 想看浏览器过程，在 .env 中设置：<code>BROWSER=headed</code></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 学习路线 -->
+        <section class="mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">🎯 下一步学习路线</h2>
+
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4 p-4 bg-blue-50 rounded-lg">
+                        <div class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 1: 基础巩固</h4>
+                            <ul class="text-gray-600 text-sm mt-1 list-disc list-inside">
+                                <li>练习写 5-10 个传统测试用例</li>
+                                <li>熟悉 BasePage 的各种方法</li>
+                                <li>学会查看 Allure 报告</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 bg-purple-50 rounded-lg">
+                        <div class="w-10 h-10 bg-purple-500 text-white rounded-full flex items-center justify-center font-bold">2</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 2: 进阶提升</h4>
+                            <ul class="text-gray-600 text-sm mt-1 list-disc list-inside">
+                                <li>学习页面对象模式 (POM)</li>
+                                <li>尝试 SmartLocator 智能定位</li>
+                                <li>学习自我修复机制</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 bg-pink-50 rounded-lg">
+                        <div class="w-10 h-10 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold">3</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 3: AI 能力</h4>
+                            <ul class="text-gray-600 text-sm mt-1 list-disc list-inside">
+                                <li>配置 AI 环境</li>
+                                <li>写 AI 驱动测试</li>
+                                <li>混合模式测试实践</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4 p-4 bg-green-50 rounded-lg">
+                        <div class="w-10 h-10 bg-green-500 text-white rounded-full flex items-center justify-center font-bold">4</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Week 4: 实战项目</h4>
+                            <ul class="text-gray-600 text-sm mt-1 list-disc list-inside">
+                                <li>为自己的项目写测试</li>
+                                <li>配置 CI/CD 自动运行</li>
+                                <li>优化测试套件性能</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 底部提示 -->
+        <div class="text-center text-white opacity-75 mt-8">
+            <p>💡 小提示：先跑通传统测试，再尝试 AI 测试 | 多看示例代码 | 善用文档 | 有问题先 Google</p>
+        </div>
+    </main>
+
+    <script>
+        // 初始化代码高亮
+        hljs.highlightAll();
+
+        // 复制代码功能
+        function copyCode(btn) {
+            const code = btn.parentElement.querySelector('code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const original = btn.innerText;
+                btn.innerText = '已复制!';
+                btn.style.background = '#48bb78';
+                setTimeout(() => {
+                    btn.innerText = original;
+                    btn.style.background = '#4a5568';
+                }, 2000);
+            });
+        }
+
+        // 滚动到指定 section
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+                updateNavDots(id);
+            }
+        }
+
+        // 更新导航点状态
+        function updateNavDots(activeId) {
+            const dots = document.querySelectorAll('.nav-dot');
+            const sections = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6', 'step7', 'step8', 'step9'];
+            const index = sections.indexOf(activeId);
+
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        // 监听滚动更新导航点
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    updateNavDots(entry.target.id);
+
+                    // 更新进度条
+                    const sections = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6', 'step7', 'step8', 'step9'];
+                    const index = sections.indexOf(entry.target.id);
+                    const progress = ((index + 1) / sections.length) * 100;
+                    document.getElementById('progressBar').style.width = progress + '%';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.step-section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

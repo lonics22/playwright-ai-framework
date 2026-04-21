@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright AI 框架 - 入门学习指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .week-card { transition: all 0.3s ease; }
+        .week-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .progress-bar { transition: width 0.5s ease; }
+        .hero-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 顶部导航 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="../index.html" class="text-gray-700 hover:text-indigo-600 mr-4">
+                        <i class="fas fa-arrow-left"></i> 返回首页
+                    </a>
+                    <span class="text-xl font-bold text-gray-800">入门学习指南</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="getting-started-guide.html" class="text-gray-600 hover:text-indigo-600">
+                        <i class="fas fa-book"></i> 新手指南
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero 区域 -->
+    <div class="hero-gradient text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">4 周掌握 Playwright AI 测试框架</h1>
+            <p class="text-xl opacity-90 max-w-3xl mx-auto mb-8">
+                从零基础到企业级自动化测试工程师，循序渐进掌握传统测试与 AI 驱动测试的精髓
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="week1-basics/index.html" class="bg-white text-indigo-600 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition">
+                    <i class="fas fa-play"></i> 开始学习
+                </a>
+                <a href="../framework-design.md" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-bold hover:bg-white hover:text-indigo-600 transition">
+                    <i class="fas fa-file-alt"></i> 查看设计文档
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学习路径概览 -->
+    <div class="max-w-7xl mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-4">学习路线图</h2>
+        <p class="text-gray-600 text-center mb-12">按照周计划循序渐进，每周都有明确的学习目标和实践任务</p>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Week 1 -->
+            <a href="week1-basics/index.html" class="week-card bg-white rounded-2xl shadow-lg overflow-hidden block">
+                <div class="h-2 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-2xl font-bold text-blue-600">1</div>
+                        <span class="text-sm text-gray-400">基础篇</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">基础巩固</h3>
+                    <p class="text-gray-600 text-sm mb-4">掌握传统自动化测试的核心技能</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-blue-500"></i>
+                            BasePage 核心方法
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-blue-500"></i>
+                            元素定位策略
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-blue-500"></i>
+                            断言与验证
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-blue-500"></i>
+                            Allure 报告
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t">
+                        <span class="text-blue-600 font-medium">进入学习 <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Week 2 -->
+            <a href="week2-advanced/index.html" class="week-card bg-white rounded-2xl shadow-lg overflow-hidden block">
+                <div class="h-2 bg-gradient-to-r from-green-400 to-green-600"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-2xl font-bold text-green-600">2</div>
+                        <span class="text-sm text-gray-400">进阶篇</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">进阶提升</h3>
+                    <p class="text-gray-600 text-sm mb-4">页面对象模式与智能定位</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            POM 页面对象模式
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            SmartLocator
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            Self-Healing 自愈
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            搭建完整框架
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t">
+                        <span class="text-green-600 font-medium">进入学习 <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Week 3 -->
+            <a href="week3-ai/index.html" class="week-card bg-white rounded-2xl shadow-lg overflow-hidden block">
+                <div class="h-2 bg-gradient-to-r from-purple-400 to-purple-600"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center text-2xl font-bold text-purple-600">3</div>
+                        <span class="text-sm text-gray-400">AI 篇</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">AI 能力</h3>
+                    <p class="text-gray-600 text-sm mb-4">智能化测试实践</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-purple-500"></i>
+                            AI 环境配置
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-purple-500"></i>
+                            自然语言测试
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-purple-500"></i>
+                            混合模式实践
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-purple-500"></i>
+                            成本优化技巧
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t">
+                        <span class="text-purple-600 font-medium">进入学习 <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- Week 4 -->
+            <a href="week4-project/index.html" class="week-card bg-white rounded-2xl shadow-lg overflow-hidden block">
+                <div class="h-2 bg-gradient-to-r from-orange-400 to-red-600"></div>
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center text-2xl font-bold text-orange-600">4</div>
+                        <span class="text-sm text-gray-400">实战篇</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">实战项目</h3>
+                    <p class="text-gray-600 text-sm mb-4">完整自动化测试解决方案</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-orange-500"></i>
+                            项目架构设计
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-orange-500"></i>
+                            核心功能实现
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-orange-500"></i>
+                            CI/CD 集成
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-500">
+                            <i class="fas fa-check-circle text-orange-500"></i>
+                            企业级测试方案
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t">
+                        <span class="text-orange-600 font-medium">进入学习 <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 学习建议 -->
+    <div class="bg-gray-100 py-16">
+        <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">学习建议</h2>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-clock text-blue-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2">每天投入 1-2 小时</h3>
+                    <p class="text-gray-600">保持每天学习的习惯，循序渐进比突击更有效</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-hands-helping text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2">动手实践</h3>
+                    <p class="text-gray-600">光看不练假把式，一定要跟着写代码</p>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-question-circle text-purple-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2">遇到问题多思考</h3>
+                    <p class="text-gray-600">先自己尝试解决，再查资料，最后请教他人</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 资源链接 -->
+    <div class="max-w-7xl mx-auto px-4 py-16">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">相关资源</h2>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            <a href="getting-started-guide.html" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition flex items-center gap-4">
+                <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-book-open text-indigo-600 text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">新手指南</h3>
+                    <p class="text-gray-600 text-sm">从零开始的环境配置与项目搭建</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
+            </a>
+
+            <a href="../test-execution-flowchart.html" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition flex items-center gap-4">
+                <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-project-diagram text-green-600 text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">测试执行流程图</h3>
+                    <p class="text-gray-600 text-sm">可视化展示测试执行流程与异常处理</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
+            </a>
+
+            <a href="../framework-design.md" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition flex items-center gap-4">
+                <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-file-alt text-purple-600 text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">框架设计文档</h3>
+                    <p class="text-gray-600 text-sm">了解框架的整体架构与设计思路</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
+            </a>
+
+            <a href="https://playwright.dev/python/" target="_blank" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition flex items-center gap-4">
+                <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-external-link-alt text-orange-600 text-2xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-800">Playwright 官方文档</h3>
+                    <p class="text-gray-600 text-sm">查阅官方 API 文档和最佳实践</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 ml-auto"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-400">Playwright AI 自动化测试框架 - 让测试更智能</p>
+            <p class="text-gray-500 text-sm mt-2">祝你学习愉快！</p>
+        </div>
+    </footer>
+
+    <script>
+        // 添加卡片悬停效果
+        document.querySelectorAll('.week-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
